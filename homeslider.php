@@ -211,6 +211,7 @@ class HomeSlider extends Module
 			else
 				$this->_html .= $this->renderAddForm();
 
+			$this->clearCache();
 		}
 		elseif (Tools::isSubmit('addSlide') || (Tools::isSubmit('id_slide') && $this->slideExists((int)Tools::getValue('id_slide'))))
 			$this->_html .= $this->renderAddForm();
