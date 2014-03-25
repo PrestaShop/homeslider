@@ -212,6 +212,7 @@ class HomeSlider extends Module
 			else
 				$this->_html .= $this->renderAddForm();
 
+			$this->clearCache();
 		}
 		elseif (Tools::isSubmit('addSlide') || (Tools::isSubmit('id_slide') && $this->slideExists((int)Tools::getValue('id_slide'))))
 			$this->_html .= $this->renderAddForm();
@@ -266,7 +267,7 @@ class HomeSlider extends Module
 				if (Tools::strlen(Tools::getValue('title_'.$language['id_lang'])) > 255)
 					$errors[] = $this->l('The title is too long.');
 				if (Tools::strlen(Tools::getValue('legend_'.$language['id_lang'])) > 255)
-					$errors[] = $this->l('The legend is too long.');
+					$errors[] = $this->l('The caption is too long.');
 				if (Tools::strlen(Tools::getValue('url_'.$language['id_lang'])) > 255)
 					$errors[] = $this->l('The URL is too long.');
 				if (Tools::strlen(Tools::getValue('description_'.$language['id_lang'])) > 4000)
@@ -284,7 +285,7 @@ class HomeSlider extends Module
 			if (Tools::strlen(Tools::getValue('title_'.$id_lang_default)) == 0)
 				$errors[] = $this->l('The title is not set.');
 			if (Tools::strlen(Tools::getValue('legend_'.$id_lang_default)) == 0)
-				$errors[] = $this->l('The legend is not set.');
+				$errors[] = $this->l('The caption is not set.');
 			if (Tools::strlen(Tools::getValue('url_'.$id_lang_default)) == 0)
 				$errors[] = $this->l('The URL is not set.');
 			if (!Tools::isSubmit('has_picture') && (!isset($_FILES['image_'.$id_lang_default]) || empty($_FILES['image_'.$id_lang_default]['tmp_name'])))
@@ -669,7 +670,7 @@ class HomeSlider extends Module
 					),
 					array(
 						'type' => 'text',
-						'label' => $this->l('Legend'),
+						'label' => $this->l('Caption'),
 						'name' => 'legend',
 						'lang' => true,
 					),
