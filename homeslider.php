@@ -473,7 +473,7 @@ class HomeSlider extends Module
 		);
 
 		$this->smarty->assign('homeslider', $slider);
-		return $this->display(__FILE__, 'header.tpl', $this->getCacheId());
+		return $this->display(__FILE__, 'header.tpl');
 	}
 
 	public function hookdisplayTop($params)
@@ -502,7 +502,6 @@ class HomeSlider extends Module
 
 	public function clearCache()
 	{
-		$this->_clearCache('header.tpl', $this->getCacheId());
 		$this->_clearCache('homeslider.tpl', $this->getCacheId());
 	}
 
