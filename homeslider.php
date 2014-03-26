@@ -42,7 +42,7 @@ class HomeSlider extends Module
 	{
 		$this->name = 'homeslider';
 		$this->tab = 'front_office_features';
-		$this->version = '1.2.8';
+		$this->version = '1.2.9';
 		$this->author = 'PrestaShop';
 		$this->need_instance = 0;
 		$this->secure_key = Tools::encrypt($this->name);
@@ -470,7 +470,7 @@ class HomeSlider extends Module
 			'width' => Configuration::get('HOMESLIDER_WIDTH'),
 			'speed' => Configuration::get('HOMESLIDER_SPEED'),
 			'pause' => Configuration::get('HOMESLIDER_PAUSE'),
-			'loop' => Configuration::get('HOMESLIDER_LOOP'),
+			'loop' => (bool)Configuration::get('HOMESLIDER_LOOP'),
 		);
 
 		$this->smarty->assign('homeslider', $slider);
@@ -503,7 +503,7 @@ class HomeSlider extends Module
 
 	public function clearCache()
 	{
-		$this->_clearCache('homeslider.tpl', $this->getCacheId());
+		$this->_clearCache('homeslider.tpl');
 	}
 
 	public function hookActionShopDataDuplication($params)
