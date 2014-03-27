@@ -24,15 +24,10 @@
 *}
 <div class="panel"><h3><i class="icon-list-ul"></i> {l s='Slides list' mod='homeslider'}
 	<span class="panel-heading-action">
-		<a id="desc-product-new"
-			class="list-toolbar-btn"
-			href="{$link->getAdminLink('AdminModules')}&configure=homeslider&addSlide=1">
-			<label>
-				<span title="" data-toggle="tooltip" class="label-tooltip" data-original-title="Add new"
-					data-html="true">
-					<i class="process-icon-new "></i>
-				</span>
-			</label>
+		<a id="desc-product-new" class="list-toolbar-btn" href="{$link->getAdminLink('AdminModules')}&configure=homeslider&addSlide=1">
+			<span title="" data-toggle="tooltip" class="label-tooltip" data-original-title="Add new" data-html="true">
+				<i class="process-icon-new "></i>
+			</span>
 		</a>
 	</span>
 	</h3>
