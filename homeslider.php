@@ -42,7 +42,7 @@ class HomeSlider extends Module
 	{
 		$this->name = 'homeslider';
 		$this->tab = 'front_office_features';
-		$this->version = '1.2.9';
+		$this->version = '1.2.10';
 		$this->author = 'PrestaShop';
 		$this->need_instance = 0;
 		$this->secure_key = Tools::encrypt($this->name);
@@ -654,6 +654,7 @@ class HomeSlider extends Module
 						'label' => $this->l('Select a file'),
 						'name' => 'image',
 						'lang' => true,
+						'desc' => $this->l(sprintf('Max image size %s', ini_get('upload_max_filesize')))
 					),
 					array(
 						'type' => 'text',
