@@ -458,7 +458,7 @@ class HomeSlider extends Module
 				$slider_class = 'col-xs-12';
 
 			$this->smarty->assign(array('homeslider_slides' => $slides,
-										'slider_class' => $slider_class);
+										'slider_class' => $slider_class));
 		}
 
 		return true;
