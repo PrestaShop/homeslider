@@ -452,13 +452,7 @@ class HomeSlider extends Module
 			if (!$slides)
 				return false;
 
-			if (Module::isInstalled('themeconfigurator'))
-				$slider_class = 'col-xs-8';
-			else
-				$slider_class = 'col-xs-12';
-
-			$this->smarty->assign(array('homeslider_slides' => $slides,
-										'slider_class' => $slider_class));
+			$this->smarty->assign(array('homeslider_slides' => $slides));
 		}
 
 		return true;
