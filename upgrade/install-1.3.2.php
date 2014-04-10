@@ -14,6 +14,7 @@ function upgrade_module_1_3_2($module)
 }
 
 if (!function_exists('recurseCopy'))
+{
 	function recurseCopy($src, $dst, $del = false)
 	{
 		$dir = opendir($src);
@@ -35,3 +36,4 @@ if (!function_exists('recurseCopy'))
 		if ($del && is_writable($src))
 			rmdir($src);
 	}
+}
