@@ -13,24 +13,25 @@ function upgrade_module_1_3_2($module)
 	return true;
 }
 
-function recurseCopy($src, $dst, $del = false)
-{
-	$dir = opendir($src);
+if (!function_exists('recurseCopy'))
+	function recurseCopy($src, $dst, $del = false)
+	{
+		$dir = opendir($src);
 
-	if (!Tools::file_exists_cache($dst))
-		mkdir($dst);
-	while (false !== ($file = readdir($dir))) {
-		if (($file != '.') && ($file != '..')) {
-			if (is_dir($src . DIRECTORY_SEPARATOR . $file))
-				recurseCopy($src . DIRECTORY_SEPARATOR . $file, $dst . DIRECTORY_SEPARATOR . $file, $del);
-			else {
-				copy($src . DIRECTORY_SEPARATOR . $file, $dst . DIRECTORY_SEPARATOR . $file);
-				if ($del && is_writable($src . DIRECTORY_SEPARATOR . $file))
-					unlink($src . DIRECTORY_SEPARATOR . $file);
+		if (!Tools::file_exists_cache($dst))
+			mkdir($dst);
+		while (false !== ($file = readdir($dir))) {
+			if (($file != '.') && ($file != '..')) {
+				if (is_dir($src . DIRECTORY_SEPARATOR . $file))
+					recurseCopy($src . DIRECTORY_SEPARATOR . $file, $dst . DIRECTORY_SEPARATOR . $file, $del);
+				else {
+					copy($src . DIRECTORY_SEPARATOR . $file, $dst . DIRECTORY_SEPARATOR . $file);
+					if ($del && is_writable($src . DIRECTORY_SEPARATOR . $file))
+						unlink($src . DIRECTORY_SEPARATOR . $file);
+				}
 			}
 		}
+		closedir($dir);
+		if ($del && is_writable($src))
+			rmdir($src);
 	}
-	closedir($dir);
-	if ($del && is_writable($src))
-		rmdir($src);
-}
