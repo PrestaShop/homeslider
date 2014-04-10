@@ -80,8 +80,8 @@ class HomeSlide extends ObjectModel
 		foreach ($images as $image)
 		{
 			if (preg_match('/sample/', $image) === 0)
-				if ($image && file_exists(dirname(__FILE__).'/img/'.$image))
-					$res &= @unlink(dirname(__FILE__).'/img/'.$image);
+				if ($image && file_exists(dirname(__FILE__).'/images/'.$image))
+					$res &= @unlink(dirname(__FILE__).'/images/'.$image);
 		}
 
 		$res &= $this->reOrderPositions();
