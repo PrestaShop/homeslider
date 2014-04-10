@@ -42,7 +42,7 @@ class HomeSlider extends Module
 	{
 		$this->name = 'homeslider';
 		$this->tab = 'front_office_features';
-		$this->version = '1.3.3';
+		$this->version = '1.3.4';
 		$this->author = 'PrestaShop';
 		$this->need_instance = 0;
 		$this->secure_key = Tools::encrypt($this->name);
@@ -391,7 +391,7 @@ class HomeSlider extends Module
 						$errors[] = $error;
 					elseif (!$temp_name || !move_uploaded_file($_FILES['image_'.$language['id_lang']]['tmp_name'], $temp_name))
 						return false;
-					elseif (!ImageManager::resize($temp_name, dirname(__FILE__).'/img/'.Tools::encrypt($_FILES['image_'.$language['id_lang']]['name'].$salt).'.'.$type, null, null, $type))
+					elseif (!ImageManager::resize($temp_name, dirname(__FILE__).'/images/'.Tools::encrypt($_FILES['image_'.$language['id_lang']]['name'].$salt).'.'.$type, null, null, $type))
 						$errors[] = $this->displayError($this->l('An error occurred during the image upload process.'));
 					if (isset($temp_name))
 						@unlink($temp_name);
@@ -444,7 +444,7 @@ class HomeSlider extends Module
 			if (is_array($slides))
 				foreach ($slides as &$slide)
 				{
-					$slide['sizes'] = @getimagesize((dirname(__FILE__).DIRECTORY_SEPARATOR.'img'.DIRECTORY_SEPARATOR.$slide['image']));
+					$slide['sizes'] = @getimagesize((dirname(__FILE__).DIRECTORY_SEPARATOR.'images'.DIRECTORY_SEPARATOR.$slide['image']));
 					if (isset($slide['sizes'][3]) && $slide['sizes'][3])
 						$slide['size'] = $slide['sizes'][3];
 				}
@@ -452,13 +452,7 @@ class HomeSlider extends Module
 			if (!$slides)
 				return false;
 
-			if (Module::isInstalled('themeconfigurator'))
-				$slider_class = 'col-xs-8';
-			else
-				$slider_class = 'col-xs-12';
-
-			$this->smarty->assign(array('homeslider_slides' => $slides,
-										'slider_class' => $slider_class));
+			$this->smarty->assign(array('homeslider_slides' => $slides));
 		}
 
 		return true;
@@ -639,7 +633,7 @@ class HomeSlider extends Module
 			array(
 				'link' => $this->context->link,
 				'slides' => $slides,
-				'image_baseurl' => $this->_path.'img/'
+				'image_baseurl' => $this->_path.'images/'
 			)
 		);
 
@@ -750,7 +744,7 @@ class HomeSlider extends Module
 			'fields_value' => $this->getAddFieldsValues(),
 			'languages' => $this->context->controller->getLanguages(),
 			'id_language' => $this->context->language->id,
-			'image_baseurl' => $this->_path.'img/'
+			'image_baseurl' => $this->_path.'images/'
 		);
 
 		$helper->override_folder = '/';
