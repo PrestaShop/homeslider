@@ -42,7 +42,7 @@ class HomeSlider extends Module
 	{
 		$this->name = 'homeslider';
 		$this->tab = 'front_office_features';
-		$this->version = '1.3.7';
+		$this->version = '1.3.8';
 		$this->author = 'PrestaShop';
 		$this->need_instance = 0;
 		$this->secure_key = Tools::encrypt($this->name);
