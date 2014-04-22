@@ -258,7 +258,7 @@ class HomeSlider extends Module
 
 				//d(var_dump(Tools::getValue('id_slide')));
 				if (!Validate::isInt(Tools::getValue('id_slide')) && !$this->slideExists(Tools::getValue('id_slide')))
-					$errors[] = $this->l('Invalid id_slide');
+					$errors[] = $this->l('Invalid slide ID');
 			}
 			/* Checks title/url/legend/description/image */
 			$languages = Language::getLanguages(false);
@@ -294,7 +294,7 @@ class HomeSlider extends Module
 				$errors[] = $this->l('The image is not set.');
 		} /* Validation for deletion */
 		elseif (Tools::isSubmit('delete_id_slide') && (!Validate::isInt(Tools::getValue('delete_id_slide')) || !$this->slideExists((int)Tools::getValue('delete_id_slide'))))
-			$errors[] = $this->l('Invalid id_slide');
+			$errors[] = $this->l('Invalid slide ID');
 
 		/* Display errors if needed */
 		if (count($errors))
@@ -346,7 +346,7 @@ class HomeSlider extends Module
 				$slide = new HomeSlide((int)Tools::getValue('id_slide'));
 				if (!Validate::isLoadedObject($slide))
 				{
-					$this->_html .= $this->displayError($this->l('Invalid id_slide'));
+					$this->_html .= $this->displayError($this->l('Invalid slide ID'));
 
 					return false;
 				}
