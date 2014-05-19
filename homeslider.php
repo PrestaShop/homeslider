@@ -765,20 +765,20 @@ class HomeSlider extends Module
 						'type' => 'text',
 						'label' => $this->l('Maximum image width'),
 						'name' => 'HOMESLIDER_WIDTH',
-						'suffix' => 'px'
+						'suffix' => 'pixels'
 					),
 					array(
 						'type' => 'text',
 						'label' => $this->l('Speed'),
 						'name' => 'HOMESLIDER_SPEED',
-						'suffix' => 'ms',
+						'suffix' => 'milliseconds',
 						'desc' => $this->l('The duration of the transition between two slides.')
 					),
 					array(
 						'type' => 'text',
 						'label' => $this->l('Pause'),
 						'name' => 'HOMESLIDER_PAUSE',
-						'suffix' => 'ms',
+						'suffix' => 'milliseconds',
 						'desc' => $this->l('The delay between two slides.')
 					),
 					array(
