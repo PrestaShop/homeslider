@@ -645,7 +645,7 @@ class HomeSlider extends Module
 		$fields_form = array(
 			'form' => array(
 				'legend' => array(
-					'title' => $this->l('Slide informations'),
+					'title' => $this->l('Slide information'),
 					'icon' => 'icon-cogs'
 				),
 				'input' => array(
@@ -654,17 +654,17 @@ class HomeSlider extends Module
 						'label' => $this->l('Select a file'),
 						'name' => 'image',
 						'lang' => true,
-						'desc' => $this->l(sprintf('Max image size %s', ini_get('upload_max_filesize')))
+						'desc' => $this->l(sprintf('Maximum image size: %s.', ini_get('upload_max_filesize')))
 					),
 					array(
 						'type' => 'text',
-						'label' => $this->l('Title'),
+						'label' => $this->l('Slide title'),
 						'name' => 'title',
 						'lang' => true,
 					),
 					array(
 						'type' => 'text',
-						'label' => $this->l('URL'),
+						'label' => $this->l('Target URL'),
 						'name' => 'url',
 						'lang' => true,
 					),
@@ -683,7 +683,7 @@ class HomeSlider extends Module
 					),
 					array(
 						'type' => 'switch',
-						'label' => $this->l('Active'),
+						'label' => $this->l('Enabled'),
 						'name' => 'active_slide',
 						'is_bool' => true,
 						'values' => array(
@@ -763,7 +763,7 @@ class HomeSlider extends Module
 				'input' => array(
 					array(
 						'type' => 'text',
-						'label' => $this->l('Max width'),
+						'label' => $this->l('Maximum image width'),
 						'name' => 'HOMESLIDER_WIDTH',
 						'suffix' => 'px'
 					),
@@ -771,13 +771,15 @@ class HomeSlider extends Module
 						'type' => 'text',
 						'label' => $this->l('Speed'),
 						'name' => 'HOMESLIDER_SPEED',
-						'suffix' => 'ms'
+						'suffix' => 'ms',
+						'desc' => $this->l('The duration of the transition between two slides.')
 					),
 					array(
 						'type' => 'text',
 						'label' => $this->l('Pause'),
 						'name' => 'HOMESLIDER_PAUSE',
-						'suffix' => 'ms'
+						'suffix' => 'ms',
+						'desc' => $this->l('The delay between two slides.')
 					),
 					array(
 						'type' => 'switch',
