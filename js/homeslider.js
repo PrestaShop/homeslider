@@ -36,7 +36,7 @@ $(document).ready(function(){
         homeslider_width = 779;
 
 
-	if (!!$.prototype.bxSlider)
+	if (!$.prototype.bxSlider)
 		$('#homeslider').bxSlider({
 			useCSS: false,
 			maxSlides: 1,
