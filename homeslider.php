@@ -259,20 +259,27 @@ class HomeSlider extends Module
 			else
 				$mode = 'edit';
 
-			if (Shop::getContext() != Shop::CONTEXT_GROUP && Shop::getContext() != Shop::CONTEXT_ALL)
-				$this->_html .= $this->renderAddForm();
-			else 
+			if ($mode == 'add') 
 			{
-				if ($mode == 'add')
-					$this->_html .= $this->getShopContextError(null, $mode);
+				if (Shop::getContext() != Shop::CONTEXT_GROUP && Shop::getContext() != Shop::CONTEXT_ALL)
+					$this->_html .= $this->renderAddForm();
 				else
+					$this->_html .= $this->getShopContextError(null, $mode);
+			}
+			else
+			{
+				$slide = new HomeSlide((int)Tools::getValue('id_slide'));
+				$associated_shop_id = $slide->getAssociatedIdShop();
+				$context_shop_id = (int)Shop::getContextShopID();
+
+				if (Shop::getContext() != Shop::CONTEXT_GROUP && Shop::getContext() != Shop::CONTEXT_ALL && $associated_shop_id == $context_shop_id)
+					$this->_html .= $this->renderAddForm();
+				else 
 				{
-					$slide = new HomeSlide((int)Tools::getValue('id_slide'));
-					$associatied_shop_id = $slide->getAssociatedIdShop();
-					$associatied_shop = new Shop($associatied_shop_id);
-					$shop_contextualized_name = (string)$associatied_shop->name;
-					$this->_html .= $this->getShopContextError($shop_contextualized_name, $mode);
+					$associated_shop = new Shop($associated_shop_id);
+					$this->_html .= $this->getShopContextError($associated_shop->name, $mode);
 				}
+				
 			}
 		}
 		else // Default viewport
@@ -981,7 +988,7 @@ class HomeSlider extends Module
 
 	private function getMultiLanguageInfoMsg()
 	{
-		return '<p class="alert alert-info">'.
+		return '<p class="alert alert-warning">'.
 					$this->l('Since multiple languages are activated on your shop, please mind to upload your image for each one of them').
 				'</p>';
 	}
