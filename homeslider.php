@@ -1015,19 +1015,25 @@ class HomeSlider extends Module
 					'</p>';
 	}
 
+	
 	private function getCurrentShopInfoMsg()
 	{
 		$shop_info = null;
 
-		if (Shop::getContext() == Shop::CONTEXT_SHOP)
-			$shop_info = $this->l(sprintf('The modifications will be applied to shop: %s', $this->context->shop->name));
-		else if (Shop::getContext() == Shop::CONTEXT_GROUP)
-			$shop_info = $this->l(sprintf('The modifications will be applied to this group: %s', Shop::getContextShopGroup()->name));
-		else
-			$shop_info = $this->l('The modifications will be applied to all shops and shop groups');
+		if (Shop::isFeatureActive())
+		{
+			if (Shop::getContext() == Shop::CONTEXT_SHOP)
+				$shop_info = $this->l(sprintf('The modifications will be applied to shop: %s', $this->context->shop->name));
+			else if (Shop::getContext() == Shop::CONTEXT_GROUP)
+				$shop_info = $this->l(sprintf('The modifications will be applied to this group: %s', Shop::getContextShopGroup()->name));
+			else
+				$shop_info = $this->l('The modifications will be applied to all shops and shop groups');
 
-		return '<div class="alert alert-info">'.
-					$shop_info.
-				'</div>';
+			return '<div class="alert alert-info">'.
+						$shop_info.
+					'</div>';
+		}
+		else
+			return '';
 	}
 }
