@@ -26,7 +26,6 @@
 
 /**
  * @since   1.5.0
- * @version 1.3 (2012-03-14)
  */
 
 if (!defined('_PS_VERSION_'))
@@ -247,7 +246,7 @@ class HomeSlider extends Module
 				$this->_html .= $this->renderForm();
 				$this->_html .= $this->renderList();
 			}
-			else 
+			else
 				$this->_html .= $this->renderAddForm();
 
 			$this->clearCache();
@@ -259,7 +258,7 @@ class HomeSlider extends Module
 			else
 				$mode = 'edit';
 
-			if ($mode == 'add') 
+			if ($mode == 'add')
 			{
 				if (Shop::getContext() != Shop::CONTEXT_GROUP && Shop::getContext() != Shop::CONTEXT_ALL)
 					$this->_html .= $this->renderAddForm();
@@ -274,12 +273,12 @@ class HomeSlider extends Module
 
 				if (Shop::getContext() != Shop::CONTEXT_GROUP && Shop::getContext() != Shop::CONTEXT_ALL && $associated_shop_id == $context_shop_id)
 					$this->_html .= $this->renderAddForm();
-				else 
+				else
 				{
 					$associated_shop = new Shop($associated_shop_id);
 					$this->_html .= $this->getShopContextError($associated_shop->name, $mode);
 				}
-				
+
 			}
 		}
 		else // Default viewport
@@ -402,7 +401,7 @@ class HomeSlider extends Module
 			}
 
 			/* Update global shop context if needed*/
-			switch ($shop_context) 
+			switch ($shop_context)
 			{
 				case Shop::CONTEXT_ALL:
 					$res = Configuration::updateValue('HOMESLIDER_WIDTH', (int)Tools::getValue('HOMESLIDER_WIDTH'));
@@ -1015,7 +1014,7 @@ class HomeSlider extends Module
 					'</p>';
 	}
 
-	
+
 	private function getCurrentShopInfoMsg()
 	{
 		$shop_info = null;
