@@ -322,8 +322,6 @@ class HomeSlider extends Module
 			/* If edit : checks id_slide */
 			if (Tools::isSubmit('id_slide'))
 			{
-
-				//d(var_dump(Tools::getValue('id_slide')));
 				if (!Validate::isInt(Tools::getValue('id_slide')) && !$this->slideExists(Tools::getValue('id_slide')))
 					$errors[] = $this->l('Invalid slide ID');
 			}
@@ -387,6 +385,7 @@ class HomeSlider extends Module
 			$shop_groups_list = array();
 			$shops = Shop::getContextListShopID();
 
+
 			foreach ($shops as $shop_id)
 			{
 				$shop_group_id = (int)Shop::getGroupFromShop($shop_id, true);
@@ -394,10 +393,20 @@ class HomeSlider extends Module
 				if (!in_array($shop_group_id, $shop_groups_list))
 					$shop_groups_list[] = $shop_group_id;
 
-				$res = Configuration::updateValue('HOMESLIDER_WIDTH', (int)Tools::getValue('HOMESLIDER_WIDTH'), false, $shop_group_id, $shop_id);
-				$res &= Configuration::updateValue('HOMESLIDER_SPEED', (int)Tools::getValue('HOMESLIDER_SPEED'), false, $shop_group_id, $shop_id);
-				$res &= Configuration::updateValue('HOMESLIDER_PAUSE', (int)Tools::getValue('HOMESLIDER_PAUSE'), false, $shop_group_id, $shop_id);
-				$res &= Configuration::updateValue('HOMESLIDER_LOOP', (int)Tools::getValue('HOMESLIDER_LOOP'), false, $shop_group_id, $shop_id);
+				if (Shop::isFeatureActive())
+				{
+					$res = Configuration::updateValue('HOMESLIDER_WIDTH', (int)Tools::getValue('HOMESLIDER_WIDTH'), false, $shop_group_id, $shop_id);
+					$res &= Configuration::updateValue('HOMESLIDER_SPEED', (int)Tools::getValue('HOMESLIDER_SPEED'), false, $shop_group_id, $shop_id);
+					$res &= Configuration::updateValue('HOMESLIDER_PAUSE', (int)Tools::getValue('HOMESLIDER_PAUSE'), false, $shop_group_id, $shop_id);
+					$res &= Configuration::updateValue('HOMESLIDER_LOOP', (int)Tools::getValue('HOMESLIDER_LOOP'), false, $shop_group_id, $shop_id);
+				}
+				else
+				{
+					$res = Configuration::updateValue('HOMESLIDER_WIDTH', (int)Tools::getValue('HOMESLIDER_WIDTH'));
+					$res &= Configuration::updateValue('HOMESLIDER_SPEED', (int)Tools::getValue('HOMESLIDER_SPEED'));
+					$res &= Configuration::updateValue('HOMESLIDER_PAUSE', (int)Tools::getValue('HOMESLIDER_PAUSE'));
+					$res &= Configuration::updateValue('HOMESLIDER_LOOP', (int)Tools::getValue('HOMESLIDER_LOOP'));
+				}
 			}
 
 			/* Update global shop context if needed*/
@@ -408,6 +417,7 @@ class HomeSlider extends Module
 					$res &= Configuration::updateValue('HOMESLIDER_SPEED', (int)Tools::getValue('HOMESLIDER_SPEED'));
 					$res &= Configuration::updateValue('HOMESLIDER_PAUSE', (int)Tools::getValue('HOMESLIDER_PAUSE'));
 					$res &= Configuration::updateValue('HOMESLIDER_LOOP', (int)Tools::getValue('HOMESLIDER_LOOP'));
+
 					if (count($shop_groups_list))
 					{
 						foreach ($shop_groups_list as $shop_group_id)
@@ -581,11 +591,47 @@ class HomeSlider extends Module
 		$this->context->controller->addJS($this->_path.'js/homeslider.js');
 		$this->context->controller->addJqueryPlugin(array('bxslider'));
 
+		if (Shop::isFeatureActive())
+		{
+			if (Shop::getContext() != Shop::CONTEXT_GROUP && Shop::getContext() != Shop::CONTEXT_ALL)
+				$shop_id = (int)Shop::getContextShopID();
+			else
+				$shop_id = null;
+			
+			$shop_group_id = (int)Shop::getContextShopGroupID();
+		}
+		else
+		{
+			$shop_group_id = null;
+			$shop_id = null;
+		}
+
+		$homeslider_width = Configuration::get('HOMESLIDER_WIDTH', null, $shop_group_id, $shop_id);
+		$homeslider_speed = Configuration::get('HOMESLIDER_SPEED', null, $shop_group_id, $shop_id);
+		$homeslider_pause = Configuration::get('HOMESLIDER_PAUSE', null, $shop_group_id, $shop_id);
+		$homeslider_loop = Configuration::get('HOMESLIDER_LOOP', null, $shop_group_id, $shop_id);
+
+		$width = (Tools::getValue('HOMESLIDER_WIDTH', $homeslider_width) !== false) ? 
+				Tools::getValue('HOMESLIDER_WIDTH', $homeslider_width) :
+				$this->default_width;
+
+		$speed = (Tools::getValue('HOMESLIDER_SPEED', $homeslider_speed) !== false) ? 
+				Tools::getValue('HOMESLIDER_SPEED', $homeslider_speed) :
+				$this->default_speed;
+
+		$pause = (Tools::getValue('HOMESLIDER_PAUSE', $homeslider_pause) !== false) ? 
+				Tools::getValue('HOMESLIDER_PAUSE', $homeslider_pause) :
+				$this->default_pause;
+
+		$loop = (Tools::getValue('HOMESLIDER_LOOP', $homeslider_loop) !== false) ?
+				Tools::getValue('HOMESLIDER_LOOP', $homeslider_loop) :
+				$this->default_loop;
+
 		$slider = array(
-			'width' => Configuration::get('HOMESLIDER_WIDTH'),
-			'speed' => Configuration::get('HOMESLIDER_SPEED'),
-			'pause' => Configuration::get('HOMESLIDER_PAUSE'),
-			'loop' => (bool)Configuration::get('HOMESLIDER_LOOP'),
+			'width' => $width,
+			'speed' => $speed,
+			'pause' => $pause,
+			'loop' => $loop
 		);
 
 		$this->smarty->assign('homeslider', $slider);
@@ -948,11 +994,47 @@ class HomeSlider extends Module
 
 	public function getConfigFieldsValues()
 	{
+
+		if (Shop::isFeatureActive())
+		{
+			if (Shop::getContext() != Shop::CONTEXT_GROUP && Shop::getContext() != Shop::CONTEXT_ALL)
+				$shop_id = (int)Shop::getContextShopID();
+			else
+				$shop_id = null;
+			$shop_group_id = (int)Shop::getContextShopGroupID();
+		}
+		else
+		{
+			$shop_group_id = null;
+			$shop_id = null;
+		}
+
+		$homeslider_width = Configuration::get('HOMESLIDER_WIDTH', null, $shop_group_id, $shop_id);
+		$homeslider_speed = Configuration::get('HOMESLIDER_SPEED', null, $shop_group_id, $shop_id);
+		$homeslider_pause = Configuration::get('HOMESLIDER_PAUSE', null, $shop_group_id, $shop_id);
+		$homeslider_loop = Configuration::get('HOMESLIDER_LOOP', null, $shop_group_id, $shop_id);
+
+		$width = (Tools::getValue('HOMESLIDER_WIDTH', $homeslider_width) !== false) ? 
+				Tools::getValue('HOMESLIDER_WIDTH', $homeslider_width) :
+				$this->default_width;
+
+		$speed = (Tools::getValue('HOMESLIDER_SPEED', $homeslider_speed) !== false) ? 
+				Tools::getValue('HOMESLIDER_SPEED', $homeslider_speed) :
+				$this->default_speed;
+
+		$pause = (Tools::getValue('HOMESLIDER_PAUSE', $homeslider_pause) !== false) ? 
+				Tools::getValue('HOMESLIDER_PAUSE', $homeslider_pause) :
+				$this->default_pause;
+
+		$loop = (Tools::getValue('HOMESLIDER_LOOP', $homeslider_loop) !== false) ?
+				Tools::getValue('HOMESLIDER_LOOP', $homeslider_loop) :
+				$this->default_loop;
+
 		return array(
-			'HOMESLIDER_WIDTH' => Tools::getValue('HOMESLIDER_WIDTH', Configuration::get('HOMESLIDER_WIDTH')),
-			'HOMESLIDER_SPEED' => Tools::getValue('HOMESLIDER_SPEED', Configuration::get('HOMESLIDER_SPEED')),
-			'HOMESLIDER_PAUSE' => Tools::getValue('HOMESLIDER_PAUSE', Configuration::get('HOMESLIDER_PAUSE')),
-			'HOMESLIDER_LOOP' => Tools::getValue('HOMESLIDER_LOOP', Configuration::get('HOMESLIDER_LOOP')),
+			'HOMESLIDER_WIDTH' => $width,
+			'HOMESLIDER_SPEED' => $speed,
+			'HOMESLIDER_PAUSE' => $pause,
+			'HOMESLIDER_LOOP' => $loop
 		);
 	}
 
