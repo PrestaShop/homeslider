@@ -36,6 +36,7 @@ include_once(_PS_MODULE_DIR_.'homeslider/HomeSlide.php');
 class HomeSlider extends Module
 {
 	private $_html = '';
+	private $error_list = array();
 	private $default_width = 779;
 	private $default_speed = 500;
 	private $default_pause = 3000;
@@ -236,9 +237,7 @@ class HomeSlider extends Module
 
 		/* Validate & process */
 		if (Tools::isSubmit('submitSlide') || Tools::isSubmit('delete_id_slide') ||
-			Tools::isSubmit('submitSlider') ||
-			Tools::isSubmit('changeStatus')
-		)
+			Tools::isSubmit('submitSlider') || Tools::isSubmit('changeStatus'))
 		{
 			if ($this->_postValidation())
 			{
@@ -251,7 +250,7 @@ class HomeSlider extends Module
 
 			$this->clearCache();
 		}
-		elseif (Tools::isSubmit('addSlide') || (Tools::isSubmit('id_slide') && $this->slideExists((int)Tools::getValue('id_slide'))))
+		elseif ((Tools::isSubmit('addSlide') || (Tools::isSubmit('id_slide')) && $this->slideExists((int)Tools::getValue('id_slide'))))
 		{
 			if (Tools::isSubmit('addSlide'))
 				$mode = 'add';
@@ -268,20 +267,31 @@ class HomeSlider extends Module
 			else
 			{
 				$slide = new HomeSlide((int)Tools::getValue('id_slide'));
-				$associated_shop_id = $slide->getAssociatedIdShop();
+				$associated_shop_id_list = $slide->getAssociatedIdShopList();
 				$context_shop_id = (int)Shop::getContextShopID();
 
-				if (Shop::getContext() != Shop::CONTEXT_GROUP && Shop::getContext() != Shop::CONTEXT_ALL && $associated_shop_id == $context_shop_id)
+				if (Shop::getContext() != Shop::CONTEXT_GROUP && Shop::getContext() != Shop::CONTEXT_ALL && in_array($context_shop_id, $associated_shop_id_list))
 					$this->_html .= $this->renderAddForm();
 				else
 				{
-					$associated_shop = new Shop($associated_shop_id);
-					$this->_html .= $this->getShopContextError($associated_shop->name, $mode);
-				}
+					$list_name_array = array();
 
+					foreach ($associated_shop_id_list as $associated_shop_id)
+					{
+						$associated_shop = new Shop($associated_shop_id);
+
+						if (!Validate::isLoadedObject($associated_shop))
+							continue;
+
+						$list_name_array[] = (string)$associated_shop->name;
+					}
+
+					$shop_name_list = implode(', ', $list_name_array);
+					$this->_html .= $this->getShopContextError($shop_name_list, $mode);
+				}
 			}
 		}
-		else // Default viewport
+		else
 		{
 			$this->_html .= $this->getWarningMultishopHtml().$this->getCurrentShopInfoMsg().$this->renderForm();
 
@@ -374,187 +384,197 @@ class HomeSlider extends Module
 		return true;
 	}
 
-	private function _postProcess()
+	private function processSlideConfiguration()
 	{
-		$errors = array();
 		$shop_context = Shop::getContext();
+		$shop_groups_list = array();
+		$shops = Shop::getContextListShopID();
 
-		/* Processes Slider */
-		if (Tools::isSubmit('submitSlider'))
+		foreach ($shops as $shop_id)
 		{
-			$shop_groups_list = array();
-			$shops = Shop::getContextListShopID();
+			$shop_group_id = (int)Shop::getGroupFromShop($shop_id, true);
 
+			if (!in_array($shop_group_id, $shop_groups_list))
+				$shop_groups_list[] = $shop_group_id;
 
-			foreach ($shops as $shop_id)
+			if (Shop::isFeatureActive())
 			{
-				$shop_group_id = (int)Shop::getGroupFromShop($shop_id, true);
-
-				if (!in_array($shop_group_id, $shop_groups_list))
-					$shop_groups_list[] = $shop_group_id;
-
-				if (Shop::isFeatureActive())
-				{
-					$res = Configuration::updateValue('HOMESLIDER_WIDTH', (int)Tools::getValue('HOMESLIDER_WIDTH'), false, $shop_group_id, $shop_id);
-					$res &= Configuration::updateValue('HOMESLIDER_SPEED', (int)Tools::getValue('HOMESLIDER_SPEED'), false, $shop_group_id, $shop_id);
-					$res &= Configuration::updateValue('HOMESLIDER_PAUSE', (int)Tools::getValue('HOMESLIDER_PAUSE'), false, $shop_group_id, $shop_id);
-					$res &= Configuration::updateValue('HOMESLIDER_LOOP', (int)Tools::getValue('HOMESLIDER_LOOP'), false, $shop_group_id, $shop_id);
-				}
-				else
-				{
-					$res = Configuration::updateValue('HOMESLIDER_WIDTH', (int)Tools::getValue('HOMESLIDER_WIDTH'));
-					$res &= Configuration::updateValue('HOMESLIDER_SPEED', (int)Tools::getValue('HOMESLIDER_SPEED'));
-					$res &= Configuration::updateValue('HOMESLIDER_PAUSE', (int)Tools::getValue('HOMESLIDER_PAUSE'));
-					$res &= Configuration::updateValue('HOMESLIDER_LOOP', (int)Tools::getValue('HOMESLIDER_LOOP'));
-				}
+				$res = Configuration::updateValue('HOMESLIDER_WIDTH', (int)Tools::getValue('HOMESLIDER_WIDTH'), false, $shop_group_id, $shop_id);
+				$res &= Configuration::updateValue('HOMESLIDER_SPEED', (int)Tools::getValue('HOMESLIDER_SPEED'), false, $shop_group_id, $shop_id);
+				$res &= Configuration::updateValue('HOMESLIDER_PAUSE', (int)Tools::getValue('HOMESLIDER_PAUSE'), false, $shop_group_id, $shop_id);
+				$res &= Configuration::updateValue('HOMESLIDER_LOOP', (int)Tools::getValue('HOMESLIDER_LOOP'), false, $shop_group_id, $shop_id);
 			}
-
-			/* Update global shop context if needed*/
-			switch ($shop_context)
-			{
-				case Shop::CONTEXT_ALL:
-					$res = Configuration::updateValue('HOMESLIDER_WIDTH', (int)Tools::getValue('HOMESLIDER_WIDTH'));
-					$res &= Configuration::updateValue('HOMESLIDER_SPEED', (int)Tools::getValue('HOMESLIDER_SPEED'));
-					$res &= Configuration::updateValue('HOMESLIDER_PAUSE', (int)Tools::getValue('HOMESLIDER_PAUSE'));
-					$res &= Configuration::updateValue('HOMESLIDER_LOOP', (int)Tools::getValue('HOMESLIDER_LOOP'));
-
-					if (count($shop_groups_list))
-					{
-						foreach ($shop_groups_list as $shop_group_id)
-						{
-							$res = Configuration::updateValue('HOMESLIDER_WIDTH', (int)Tools::getValue('HOMESLIDER_WIDTH'), false, $shop_group_id);
-							$res &= Configuration::updateValue('HOMESLIDER_SPEED', (int)Tools::getValue('HOMESLIDER_SPEED'), false, $shop_group_id);
-							$res &= Configuration::updateValue('HOMESLIDER_PAUSE', (int)Tools::getValue('HOMESLIDER_PAUSE'), false, $shop_group_id);
-							$res &= Configuration::updateValue('HOMESLIDER_LOOP', (int)Tools::getValue('HOMESLIDER_LOOP'), false, $shop_group_id);
-						}
-					}
-					break;
-				case Shop::CONTEXT_GROUP:
-					if (count($shop_groups_list))
-					{
-						foreach ($shop_groups_list as $shop_group_id)
-						{
-							$res = Configuration::updateValue('HOMESLIDER_WIDTH', (int)Tools::getValue('HOMESLIDER_WIDTH'), false, $shop_group_id);
-							$res &= Configuration::updateValue('HOMESLIDER_SPEED', (int)Tools::getValue('HOMESLIDER_SPEED'), false, $shop_group_id);
-							$res &= Configuration::updateValue('HOMESLIDER_PAUSE', (int)Tools::getValue('HOMESLIDER_PAUSE'), false, $shop_group_id);
-							$res &= Configuration::updateValue('HOMESLIDER_LOOP', (int)Tools::getValue('HOMESLIDER_LOOP'), false, $shop_group_id);
-						}
-					}
-					break;
-			}
-
-			$this->clearCache();
-
-			if (!$res)
-				$errors[] = $this->displayError($this->l('The configuration could not be updated.'));
 			else
-				Tools::redirectAdmin($this->context->link->getAdminLink('AdminModules', true).'&conf=6&configure='.$this->name.'&tab_module='.$this->tab.'&module_name='.$this->name);
-		} /* Process Slide status */
-		elseif (Tools::isSubmit('changeStatus') && Tools::isSubmit('id_slide'))
+			{
+				$res = Configuration::updateValue('HOMESLIDER_WIDTH', (int)Tools::getValue('HOMESLIDER_WIDTH'));
+				$res &= Configuration::updateValue('HOMESLIDER_SPEED', (int)Tools::getValue('HOMESLIDER_SPEED'));
+				$res &= Configuration::updateValue('HOMESLIDER_PAUSE', (int)Tools::getValue('HOMESLIDER_PAUSE'));
+				$res &= Configuration::updateValue('HOMESLIDER_LOOP', (int)Tools::getValue('HOMESLIDER_LOOP'));
+			}
+		}
+
+		/* Update global shop context if needed*/
+		switch ($shop_context)
+		{
+			case Shop::CONTEXT_ALL:
+				$res = Configuration::updateValue('HOMESLIDER_WIDTH', (int)Tools::getValue('HOMESLIDER_WIDTH'));
+				$res &= Configuration::updateValue('HOMESLIDER_SPEED', (int)Tools::getValue('HOMESLIDER_SPEED'));
+				$res &= Configuration::updateValue('HOMESLIDER_PAUSE', (int)Tools::getValue('HOMESLIDER_PAUSE'));
+				$res &= Configuration::updateValue('HOMESLIDER_LOOP', (int)Tools::getValue('HOMESLIDER_LOOP'));
+
+				if (count($shop_groups_list))
+				{
+					foreach ($shop_groups_list as $shop_group_id)
+					{
+						$res = Configuration::updateValue('HOMESLIDER_WIDTH', (int)Tools::getValue('HOMESLIDER_WIDTH'), false, $shop_group_id);
+						$res &= Configuration::updateValue('HOMESLIDER_SPEED', (int)Tools::getValue('HOMESLIDER_SPEED'), false, $shop_group_id);
+						$res &= Configuration::updateValue('HOMESLIDER_PAUSE', (int)Tools::getValue('HOMESLIDER_PAUSE'), false, $shop_group_id);
+						$res &= Configuration::updateValue('HOMESLIDER_LOOP', (int)Tools::getValue('HOMESLIDER_LOOP'), false, $shop_group_id);
+					}
+				}
+				break;
+			case Shop::CONTEXT_GROUP:
+				if (count($shop_groups_list))
+				{
+					foreach ($shop_groups_list as $shop_group_id)
+					{
+						$res = Configuration::updateValue('HOMESLIDER_WIDTH', (int)Tools::getValue('HOMESLIDER_WIDTH'), false, $shop_group_id);
+						$res &= Configuration::updateValue('HOMESLIDER_SPEED', (int)Tools::getValue('HOMESLIDER_SPEED'), false, $shop_group_id);
+						$res &= Configuration::updateValue('HOMESLIDER_PAUSE', (int)Tools::getValue('HOMESLIDER_PAUSE'), false, $shop_group_id);
+						$res &= Configuration::updateValue('HOMESLIDER_LOOP', (int)Tools::getValue('HOMESLIDER_LOOP'), false, $shop_group_id);
+					}
+				}
+				break;
+		}
+
+		$this->clearCache();
+
+		if (!$res)
+			$this->error_list[] = $this->displayError($this->l('The configuration could not be updated.'));
+		else
+			Tools::redirectAdmin($this->context->link->getAdminLink('AdminModules', true).'&conf=6&configure='.$this->name.'&tab_module='.$this->tab.'&module_name='.$this->name);
+	}
+
+	private function processSlideStatus()
+	{
+		$slide = new HomeSlide((int)Tools::getValue('id_slide'));
+		if ($slide->active == 0)
+			$slide->active = 1;
+		else
+			$slide->active = 0;
+		$res = $slide->update();
+		$this->clearCache();
+		$this->_html .= ($res ? $this->displayConfirmation($this->l('Configuration updated')) : $this->displayError($this->l('The configuration could not be updated.')));
+	}
+
+	private function processSlideEdition()
+	{
+		/* Sets ID if needed */
+		if (Tools::getValue('id_slide'))
 		{
 			$slide = new HomeSlide((int)Tools::getValue('id_slide'));
-			if ($slide->active == 0)
-				$slide->active = 1;
-			else
-				$slide->active = 0;
-			$res = $slide->update();
-			$this->clearCache();
-			$this->_html .= ($res ? $this->displayConfirmation($this->l('Configuration updated')) : $this->displayError($this->l('The configuration could not be updated.')));
-		}
-		/* Processes Slide */
-		elseif (Tools::isSubmit('submitSlide'))
-		{
-			/* Sets ID if needed */
-			if (Tools::getValue('id_slide'))
+			if (!Validate::isLoadedObject($slide))
 			{
-				$slide = new HomeSlide((int)Tools::getValue('id_slide'));
-				if (!Validate::isLoadedObject($slide))
-				{
-					$this->_html .= $this->displayError($this->l('Invalid slide ID'));
+				$this->_html .= $this->displayError($this->l('Invalid slide ID'));
+				return false;
+			}
+		}
+		else
+			$slide = new HomeSlide();
+		/* Sets position */
+		$slide->position = (int)Tools::getValue('position');
+		/* Sets active */
+		$slide->active = (int)Tools::getValue('active_slide');
 
+		/* Sets each langue fields */
+		$languages = Language::getLanguages(false);
+
+		foreach ($languages as $language)
+		{
+			$slide->title[$language['id_lang']] = Tools::getValue('title_'.$language['id_lang']);
+			$slide->url[$language['id_lang']] = Tools::getValue('url_'.$language['id_lang']);
+			$slide->legend[$language['id_lang']] = Tools::getValue('legend_'.$language['id_lang']);
+			$slide->description[$language['id_lang']] = Tools::getValue('description_'.$language['id_lang']);
+
+			/* Uploads image and sets slide */
+			$type = Tools::strtolower(Tools::substr(strrchr($_FILES['image_'.$language['id_lang']]['name'], '.'), 1));
+			$imagesize = @getimagesize($_FILES['image_'.$language['id_lang']]['tmp_name']);
+			if (isset($_FILES['image_'.$language['id_lang']]) &&
+				isset($_FILES['image_'.$language['id_lang']]['tmp_name']) &&
+				!empty($_FILES['image_'.$language['id_lang']]['tmp_name']) &&
+				!empty($imagesize) &&
+				in_array(
+					Tools::strtolower(Tools::substr(strrchr($imagesize['mime'], '/'), 1)), array(
+						'jpg',
+						'gif',
+						'jpeg',
+						'png'
+					)
+				) &&
+				in_array($type, array('jpg', 'gif', 'jpeg', 'png'))
+			)
+			{
+				$temp_name = tempnam(_PS_TMP_IMG_DIR_, 'PS');
+				$salt = sha1(microtime());
+				if ($error = ImageManager::validateUpload($_FILES['image_'.$language['id_lang']]))
+					$this->error_list[] = $error;
+				elseif (!$temp_name || !move_uploaded_file($_FILES['image_'.$language['id_lang']]['tmp_name'], $temp_name))
 					return false;
-				}
+				elseif (!ImageManager::resize($temp_name, dirname(__FILE__).'/images/'.$salt.'_'.$_FILES['image_'.$language['id_lang']]['name'], null, null, $type))
+					$this->error_list[] = $this->displayError($this->l('An error occurred during the image upload process.'));
+				if (isset($temp_name))
+					@unlink($temp_name);
+				$slide->image[$language['id_lang']] = $salt.'_'.$_FILES['image_'.$language['id_lang']]['name'];
 			}
-			else
-				$slide = new HomeSlide();
-			/* Sets position */
-			$slide->position = (int)Tools::getValue('position');
-			/* Sets active */
-			$slide->active = (int)Tools::getValue('active_slide');
-
-			/* Sets each langue fields */
-			$languages = Language::getLanguages(false);
-
-			foreach ($languages as $language)
-			{
-				$slide->title[$language['id_lang']] = Tools::getValue('title_'.$language['id_lang']);
-				$slide->url[$language['id_lang']] = Tools::getValue('url_'.$language['id_lang']);
-				$slide->legend[$language['id_lang']] = Tools::getValue('legend_'.$language['id_lang']);
-				$slide->description[$language['id_lang']] = Tools::getValue('description_'.$language['id_lang']);
-
-				/* Uploads image and sets slide */
-				$type = Tools::strtolower(Tools::substr(strrchr($_FILES['image_'.$language['id_lang']]['name'], '.'), 1));
-				$imagesize = @getimagesize($_FILES['image_'.$language['id_lang']]['tmp_name']);
-				if (isset($_FILES['image_'.$language['id_lang']]) &&
-					isset($_FILES['image_'.$language['id_lang']]['tmp_name']) &&
-					!empty($_FILES['image_'.$language['id_lang']]['tmp_name']) &&
-					!empty($imagesize) &&
-					in_array(
-						Tools::strtolower(Tools::substr(strrchr($imagesize['mime'], '/'), 1)), array(
-							'jpg',
-							'gif',
-							'jpeg',
-							'png'
-						)
-					) &&
-					in_array($type, array('jpg', 'gif', 'jpeg', 'png'))
-				)
-				{
-					$temp_name = tempnam(_PS_TMP_IMG_DIR_, 'PS');
-					$salt = sha1(microtime());
-					if ($error = ImageManager::validateUpload($_FILES['image_'.$language['id_lang']]))
-						$errors[] = $error;
-					elseif (!$temp_name || !move_uploaded_file($_FILES['image_'.$language['id_lang']]['tmp_name'], $temp_name))
-						return false;
-					elseif (!ImageManager::resize($temp_name, dirname(__FILE__).'/images/'.$salt.'_'.$_FILES['image_'.$language['id_lang']]['name'], null, null, $type))
-						$errors[] = $this->displayError($this->l('An error occurred during the image upload process.'));
-					if (isset($temp_name))
-						@unlink($temp_name);
-					$slide->image[$language['id_lang']] = $salt.'_'.$_FILES['image_'.$language['id_lang']]['name'];
-				}
-				elseif (Tools::getValue('image_old_'.$language['id_lang']) != '')
-					$slide->image[$language['id_lang']] = Tools::getValue('image_old_'.$language['id_lang']);
-			}
-
-			/* Processes if no errors  */
-			if (!$errors)
-			{
-				/* Adds */
-				if (!Tools::getValue('id_slide'))
-				{
-					if (!$slide->add())
-						$errors[] = $this->displayError($this->l('The slide could not be added.'));
-				}
-				/* Update */
-				elseif (!$slide->update())
-					$errors[] = $this->displayError($this->l('The slide could not be updated.'));
-				$this->clearCache();
-			}
-		} /* Deletes */
-		elseif (Tools::isSubmit('delete_id_slide'))
-		{
-			$slide = new HomeSlide((int)Tools::getValue('delete_id_slide'));
-			$res = $slide->delete();
-			$this->clearCache();
-			if (!$res)
-				$this->_html .= $this->displayError('Could not delete.');
-			else
-				Tools::redirectAdmin($this->context->link->getAdminLink('AdminModules', true).'&conf=1&configure='.$this->name.'&tab_module='.$this->tab.'&module_name='.$this->name);
+			elseif (Tools::getValue('image_old_'.$language['id_lang']) != '')
+				$slide->image[$language['id_lang']] = Tools::getValue('image_old_'.$language['id_lang']);
 		}
 
-		/* Display errors if needed */
-		if (count($errors))
-			$this->_html .= $this->displayError(implode('<br />', $errors));
+		/* Processes if no errors  */
+		if (!count($this->error_list))
+		{
+			/* Adds */
+			if (!Tools::getValue('id_slide'))
+			{
+				if (!$slide->add())
+					$this->error_list[] = $this->displayError($this->l('The slide could not be added.'));
+			}
+			/* Update */
+			elseif (!$slide->update())
+				$this->error_list[] = $this->displayError($this->l('The slide could not be updated.'));
+			$this->clearCache();
+		}
+	}
+
+	private function processSlideDeletion()
+	{
+		$slide = new HomeSlide((int)Tools::getValue('delete_id_slide'));
+		$res = $slide->delete();
+		$this->clearCache();
+		if (!$res)
+			$this->_html .= $this->displayError('Could not delete.');
+		else
+			Tools::redirectAdmin($this->context->link->getAdminLink('AdminModules', true).'&conf=1&configure='.$this->name.'&tab_module='.$this->tab.'&module_name='.$this->name);
+	}
+
+	private function _postProcess()
+	{
+		/* Processes Slider Configuration */
+		if (Tools::isSubmit('submitSlider'))
+			$this->processSlideConfiguration();
+		/* Process Slide Status */
+		elseif (Tools::isSubmit('changeStatus') && Tools::isSubmit('id_slide'))
+			$this->processSlideStatus();
+		/* Processes Slide Edition */
+		elseif (Tools::isSubmit('submitSlide'))
+			$this->processSlideEdition();
+		/* Deletes */
+		elseif (Tools::isSubmit('delete_id_slide'))
+			$this->processSlideDeletion();
+
+		/* Display errors if needed / redirect */
+		if (count($this->error_list))
+			$this->_html .= $this->displayError(implode('<br />', $this->error_list));
 		elseif (Tools::isSubmit('submitSlide') && Tools::getValue('id_slide'))
 			Tools::redirectAdmin($this->context->link->getAdminLink('AdminModules', true).'&conf=4&configure='.$this->name.'&tab_module='.$this->tab.'&module_name='.$this->name);
 		elseif (Tools::isSubmit('submitSlide'))
