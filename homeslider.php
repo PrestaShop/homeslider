@@ -67,8 +67,7 @@ class HomeSlider extends Module
 		/* Adds Module */
 		if (parent::install() &&
 			$this->registerHook('displayHeader') &&
-			$this->registerHook('displayTopColumn') &&
-			$this->registerHook('actionShopDataDuplication')
+			$this->registerHook('displayTopColumn')
 		)
 		{
 			$shops = Shop::getContextListShopID();
@@ -685,17 +684,6 @@ class HomeSlider extends Module
 	public function clearCache()
 	{
 		$this->_clearCache('homeslider.tpl');
-	}
-
-	public function hookActionShopDataDuplication($params)
-	{
-		Db::getInstance()->execute('
-			INSERT IGNORE INTO '._DB_PREFIX_.'homeslider (id_homeslider_slides, id_shop)
-			SELECT id_homeslider_slides, '.(int)$params['new_id_shop'].'
-			FROM '._DB_PREFIX_.'homeslider
-			WHERE id_shop = '.(int)$params['old_id_shop']
-		);
-		$this->clearCache();
 	}
 
 	public function headerHTML()
