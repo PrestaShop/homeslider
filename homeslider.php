@@ -820,11 +820,15 @@ class HomeSlider extends Module
 
 		foreach ($shop_list_assoc as $shop_id)
 		{
-			$shop_info = Shop::getShop((int)$shop_id);
-			$shop_name_array[] = $shop_info['name'];
+			$shop_info = new Shop((int)$shop_id);
+			if (Validate::isLoadedObject($shop_info))
+				$shop_name_array[] = (string)$shop_info->name;
 		}
-		
-		return $this->getSharedSlideInfoMsg(implode(', ', $shop_name_array));
+
+		if (count($shop_name_array) > 1)
+			return $this->getSharedSlideInfoMsg(implode(', ', $shop_name_array));
+		else
+			return null;
 	}
 
 	public function renderList()
@@ -836,7 +840,6 @@ class HomeSlider extends Module
 			$slides[$key]['status'] = $this->displayStatus($slide['id_slide'], $slide['active']);
 			$slides[$key]['shared_slide_msg'] = $this->getSharedSlideMsg($slide['id_slide']);
 		}
-
 
 		$this->context->smarty->assign(
 			array(
@@ -929,6 +932,8 @@ class HomeSlider extends Module
 
 			if ($has_picture)
 				$fields_form['form']['input'][] = array('type' => 'hidden', 'name' => 'has_picture');
+
+			$shared_slide_msg = $this->getSharedSlideMsg((int)Tools::getValue('id_slide'));
 		}
 
 		$helper = new HelperForm();
@@ -961,9 +966,9 @@ class HomeSlider extends Module
 		$languages = Language::getLanguages(false);
 
 		if (count($languages) > 1)
-			return $this->getMultiLanguageInfoMsg().$helper->generateForm(array($fields_form));
+			return $this->getMultiLanguageInfoMsg().$shared_slide_msg.$helper->generateForm(array($fields_form));
 		else
-			return $helper->generateForm(array($fields_form));
+			return $shared_slide_msg.$helper->generateForm(array($fields_form));
 	}
 
 	public function renderForm()
@@ -1146,7 +1151,7 @@ class HomeSlider extends Module
 
 	private function getSharedSlideInfoMsg($shop_list)
 	{
-		return '<p class="alert alert-warning">'.
+		return '<p class="alert alert-info">'.
 					$this->l(sprintf('This slide is shared between these shops: %s', $shop_list)).
 				'</p>';
 	}
