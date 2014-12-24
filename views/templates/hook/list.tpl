@@ -44,9 +44,9 @@
 						</div>
 						<div class="col-md-8">
 							<h4 class="pull-left">#{$slide.id_slide} - {$slide.title}</h4>
+
 							<div class="btn-group-action pull-right">
 								{$slide.status}
-								
 								<a class="btn btn-default"
 									href="{$link->getAdminLink('AdminModules')}&configure=homeslider&id_slide={$slide.id_slide}">
 									<i class="icon-edit"></i>
@@ -59,6 +59,11 @@
 								</a>
 							</div>
 						</div>
+						{if isset($slide.shared_slide_msg)}
+							<div class="col-md-8 pull-right" style='margin-top: 20px;'>
+								{$slide.shared_slide_msg}
+							</div>
+						{/if}
 					</div>
 				</div>
 			{/foreach}

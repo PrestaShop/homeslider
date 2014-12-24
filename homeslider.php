@@ -67,7 +67,8 @@ class HomeSlider extends Module
 		/* Adds Module */
 		if (parent::install() &&
 			$this->registerHook('displayHeader') &&
-			$this->registerHook('displayTopColumn')
+			$this->registerHook('displayTopColumn') &&
+			$this->registerHook('actionShopDataDuplication')
 		)
 		{
 			$shops = Shop::getContextListShopID();
@@ -686,6 +687,17 @@ class HomeSlider extends Module
 		$this->_clearCache('homeslider.tpl');
 	}
 
+	public function hookActionShopDataDuplication($params)
+	{
+		Db::getInstance()->execute('
+			INSERT IGNORE INTO '._DB_PREFIX_.'homeslider (id_homeslider_slides, id_shop)
+			SELECT id_homeslider_slides, '.(int)$params['new_id_shop'].'
+			FROM '._DB_PREFIX_.'homeslider
+			WHERE id_shop = '.(int)$params['old_id_shop']
+		);
+		$this->clearCache();
+	}
+
 	public function headerHTML()
 	{
 		if (Tools::getValue('controller') != 'AdminModules' && Tools::getValue('configure') != $this->name)
@@ -792,11 +804,39 @@ class HomeSlider extends Module
 		return ($row);
 	}
 
+	public function getSharedSlideMsg($id_slide)
+	{
+		$slide = new HomeSlide((int)$id_slide);
+
+		if (!Validate::isLoadedObject($slide))
+			return null;
+
+		$shop_list_assoc = $slide->getAssociatedIdShopList();
+
+		if (!$shop_list_assoc)
+			return null;
+
+		$shop_name_array = array();
+
+		foreach ($shop_list_assoc as $shop_id)
+		{
+			$shop_info = Shop::getShop((int)$shop_id);
+			$shop_name_array[] = $shop_info['name'];
+		}
+		
+		return $this->getSharedSlideInfoMsg(implode(', ', $shop_name_array));
+	}
+
 	public function renderList()
 	{
 		$slides = $this->getSlides();
+
 		foreach ($slides as $key => $slide)
+		{
 			$slides[$key]['status'] = $this->displayStatus($slide['id_slide'], $slide['active']);
+			$slides[$key]['shared_slide_msg'] = $this->getSharedSlideMsg($slide['id_slide']);
+		}
+
 
 		$this->context->smarty->assign(
 			array(
@@ -1104,6 +1144,12 @@ class HomeSlider extends Module
 					'</p>';
 	}
 
+	private function getSharedSlideInfoMsg($shop_list)
+	{
+		return '<p class="alert alert-warning">'.
+					$this->l(sprintf('This slide is shared between these shops: %s', $shop_list)).
+				'</p>';
+	}
 
 	private function getCurrentShopInfoMsg()
 	{
