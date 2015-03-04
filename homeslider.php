@@ -783,6 +783,7 @@ class HomeSlider extends Module
 						'type' => 'file_lang',
 						'label' => $this->l('Select a file'),
 						'name' => 'image',
+						'required' => true,
 						'lang' => true,
 						'desc' => sprintf($this->l('Maximum image size: %s.', ini_get('upload_max_filesize')))
 					),
@@ -790,18 +791,21 @@ class HomeSlider extends Module
 						'type' => 'text',
 						'label' => $this->l('Slide title'),
 						'name' => 'title',
+						'required' => true,
 						'lang' => true,
 					),
 					array(
 						'type' => 'text',
 						'label' => $this->l('Target URL'),
 						'name' => 'url',
+						'required' => true,
 						'lang' => true,
 					),
 					array(
 						'type' => 'text',
 						'label' => $this->l('Caption'),
 						'name' => 'legend',
+						'required' => true,
 						'lang' => true,
 					),
 					array(
