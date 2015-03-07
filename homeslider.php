@@ -784,7 +784,7 @@ class HomeSlider extends Module
 						'label' => $this->l('Select a file'),
 						'name' => 'image',
 						'lang' => true,
-						'desc' => sprintf($this->l('Maximum image size: %s.', ini_get('upload_max_filesize')))
+						'desc' => sprintf($this->l('Maximum image size: %s.'), ini_get('upload_max_filesize'))
 					),
 					array(
 						'type' => 'text',
@@ -1027,7 +1027,7 @@ class HomeSlider extends Module
 
 		if ($mode == 'edit')
 			return '<p class="alert alert-danger">'.
-							sprintf($this->l('You can only edit this slide from the shop(s) context: %s', $shop_contextualized_name)).
+							sprintf($this->l('You can only edit this slide from the shop(s) context: %s'), $shop_contextualized_name).
 					'</p>';
 		else
 			return '<p class="alert alert-danger">'.
@@ -1038,7 +1038,7 @@ class HomeSlider extends Module
 	private function getShopAssociationError($id_slide)
 	{
 		return '<p class="alert alert-danger">'.
-						sprintf($this->l('Unable to get slide shop association information (id_slide: %d)', (int)$id_slide)).
+						sprintf($this->l('Unable to get slide shop association information (id_slide: %d)'), (int)$id_slide).
 				'</p>';
 	}
 
@@ -1050,9 +1050,9 @@ class HomeSlider extends Module
 		if (Shop::isFeatureActive())
 		{
 			if (Shop::getContext() == Shop::CONTEXT_SHOP)
-				$shop_info = sprintf($this->l('The modifications will be applied to shop: %s', $this->context->shop->name));
+				$shop_info = sprintf($this->l('The modifications will be applied to shop: %s'), $this->context->shop->name);
 			else if (Shop::getContext() == Shop::CONTEXT_GROUP)
-				$shop_info = sprintf($this->l('The modifications will be applied to this group: %s', Shop::getContextShopGroup()->name));
+				$shop_info = sprintf($this->l('The modifications will be applied to this group: %s'), Shop::getContextShopGroup()->name);
 			else
 				$shop_info = $this->l('The modifications will be applied to all shops and shop groups');
 
