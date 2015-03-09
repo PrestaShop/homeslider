@@ -1,5 +1,5 @@
 {*
-* 2007-2014 PrestaShop
+* 2007-2015 PrestaShop
 *
 * NOTICE OF LICENSE
 *
@@ -18,14 +18,14 @@
 * needs please refer to http://www.prestashop.com for more information.
 *
 *  @author PrestaShop SA <contact@prestashop.com>
-*  @copyright  2007-2014 PrestaShop SA
+*  @copyright  2007-2015 PrestaShop SA
 *  @license    http://opensource.org/licenses/afl-3.0.php  Academic Free License (AFL 3.0)
 *  International Registered Trademark & Property of PrestaShop SA
 *}
 <div class="panel"><h3><i class="icon-list-ul"></i> {l s='Slides list' mod='homeslider'}
 	<span class="panel-heading-action">
 		<a id="desc-product-new" class="list-toolbar-btn" href="{$link->getAdminLink('AdminModules')}&configure=homeslider&addSlide=1">
-			<span title="" data-toggle="tooltip" class="label-tooltip" data-original-title="Add new" data-html="true">
+			<span title="" data-toggle="tooltip" class="label-tooltip" data-original-title="{l s='Add new' mod='homeslider'}" data-html="true">
 				<i class="process-icon-new "></i>
 			</span>
 		</a>
