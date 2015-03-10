@@ -35,8 +35,8 @@
 }
 /*pager links*/
 .bx-pager {
-   position: absolute;
-   bottom: 20px;
+	position: absolute;
+	bottom: 20px;
 	bottom:40px !ie;/* hack ie7 */
 	right: 15px;
 	padding-top: 7px;
