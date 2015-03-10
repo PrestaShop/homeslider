@@ -688,7 +688,7 @@ class HomeSlider extends Module
 		$id_lang = $this->context->language->id;
 
 		return Db::getInstance(_PS_USE_SQL_SLAVE_)->executeS('
-			SELECT hs.`id_homeslider_slides` as id_slide, hssl.`image`, hss.`position`, hss.`active`, hssl.`title`,
+			SELECT hs.`id_homeslider_slides` as id_slide, hss.`position`, hss.`active`, hssl.`title`,
 			hssl.`url`, hssl.`legend`, hssl.`description`, hssl.`image`
 			FROM '._DB_PREFIX_.'homeslider hs
 			LEFT JOIN '._DB_PREFIX_.'homeslider_slides hss ON (hs.id_homeslider_slides = hss.id_homeslider_slides)
