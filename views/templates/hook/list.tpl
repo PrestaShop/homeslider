@@ -55,7 +55,7 @@
 							</h4>
 							<div class="btn-group-action pull-right">
 								{$slide.status}
-								
+
 								<a class="btn btn-default"
 									href="{$link->getAdminLink('AdminModules')}&configure=homeslider&id_slide={$slide.id_slide}">
 									<i class="icon-edit"></i>
