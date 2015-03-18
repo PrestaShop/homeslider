@@ -688,7 +688,7 @@ class HomeSlider extends Module
 		$id_lang = $this->context->language->id;
 
 		return Db::getInstance(_PS_USE_SQL_SLAVE_)->executeS('
-			SELECT hs.`id_homeslider_slides` as id_slide, hssl.`image`, hss.`position`, hss.`active`, hssl.`title`,
+			SELECT hs.`id_homeslider_slides` as id_slide, hss.`position`, hss.`active`, hssl.`title`,
 			hssl.`url`, hssl.`legend`, hssl.`description`, hssl.`image`
 			FROM '._DB_PREFIX_.'homeslider hs
 			LEFT JOIN '._DB_PREFIX_.'homeslider_slides hss ON (hs.id_homeslider_slides = hss.id_homeslider_slides)
@@ -783,6 +783,7 @@ class HomeSlider extends Module
 						'type' => 'file_lang',
 						'label' => $this->l('Select a file'),
 						'name' => 'image',
+						'required' => true,
 						'lang' => true,
 						'desc' => sprintf($this->l('Maximum image size: %s.'), ini_get('upload_max_filesize'))
 					),
@@ -790,18 +791,21 @@ class HomeSlider extends Module
 						'type' => 'text',
 						'label' => $this->l('Slide title'),
 						'name' => 'title',
+						'required' => true,
 						'lang' => true,
 					),
 					array(
 						'type' => 'text',
 						'label' => $this->l('Target URL'),
 						'name' => 'url',
+						'required' => true,
 						'lang' => true,
 					),
 					array(
 						'type' => 'text',
 						'label' => $this->l('Caption'),
 						'name' => 'legend',
+						'required' => true,
 						'lang' => true,
 					),
 					array(
