@@ -590,10 +590,10 @@ class HomeSlider extends Module
 		$this->context->controller->addJqueryPlugin(array('bxslider'));
 
 		$slider = array(
-			'width' => Configuration::get('HOMESLIDER_WIDTH'),
-			'speed' => Configuration::get('HOMESLIDER_SPEED'),
-			'pause' => Configuration::get('HOMESLIDER_PAUSE'),
-			'loop' => (bool)Configuration::get('HOMESLIDER_LOOP'),
+			'width' => Configuration::get('HOMESLIDER_WIDTH', false, $this->context->shop->getGroup(), $this->context->shop->id),
+			'speed' => Configuration::get('HOMESLIDER_SPEED', false, $this->context->shop->getGroup(), $this->context->shop->id),
+			'pause' => Configuration::get('HOMESLIDER_PAUSE', false, $this->context->shop->getGroup(), $this->context->shop->id),
+			'loop' => (bool)Configuration::get('HOMESLIDER_LOOP', false, $this->context->shop->getGroup(), $this->context->shop->id),
 		);
 
 		$this->smarty->assign('homeslider', $slider);
