@@ -35,11 +35,11 @@ include_once(_PS_MODULE_DIR_.'homeslider/HomeSlide.php');
 
 class HomeSlider extends Module
 {
-	private $_html = '';
-	private $default_width = 779;
-	private $default_speed = 500;
-	private $default_pause = 3000;
-	private $default_loop = 1;
+	protected $_html = '';
+	protected $default_width = 779;
+	protected $default_speed = 500;
+	protected $default_pause = 3000;
+	protected $default_loop = 1;
 
 	public function __construct()
 	{
@@ -125,7 +125,7 @@ class HomeSlider extends Module
 	/**
 	 * Adds samples
 	 */
-	private function installSamples()
+	protected function installSamples()
 	{
 		$languages = Language::getLanguages(false);
 		for ($i = 1; $i <= 3; ++$i)
@@ -301,7 +301,7 @@ class HomeSlider extends Module
 		return $this->_html;
 	}
 
-	private function _postValidation()
+	protected function _postValidation()
 	{
 		$errors = array();
 
@@ -385,7 +385,7 @@ class HomeSlider extends Module
 		return true;
 	}
 
-	private function _postProcess()
+	protected function _postProcess()
 	{
 		$errors = array();
 		$shop_context = Shop::getContext();
@@ -559,7 +559,7 @@ class HomeSlider extends Module
 			Tools::redirectAdmin($this->context->link->getAdminLink('AdminModules', true).'&conf=3&configure='.$this->name.'&tab_module='.$this->tab.'&module_name='.$this->name);
 	}
 
-	private function _prepareHook()
+	protected function _prepareHook()
 	{
 		if (!$this->isCached('homeslider.tpl', $this->getCacheId()))
 		{
@@ -1008,14 +1008,14 @@ class HomeSlider extends Module
 		return $fields;
 	}
 
-	private function getMultiLanguageInfoMsg()
+	protected function getMultiLanguageInfoMsg()
 	{
 		return '<p class="alert alert-warning">'.
 					$this->l('Since multiple languages are activated on your shop, please mind to upload your image for each one of them').
 				'</p>';
 	}
 
-	private function getWarningMultishopHtml()
+	protected function getWarningMultishopHtml()
 	{
 		if (Shop::getContext() == Shop::CONTEXT_GROUP || Shop::getContext() == Shop::CONTEXT_ALL)
 			return '<p class="alert alert-warning">'.
@@ -1025,7 +1025,7 @@ class HomeSlider extends Module
 			return '';
 	}
 
-	private function getShopContextError($shop_contextualized_name, $mode)
+	protected function getShopContextError($shop_contextualized_name, $mode)
 	{
 		if (is_array($shop_contextualized_name))
 			$shop_contextualized_name = implode('<br/>', $shop_contextualized_name);
@@ -1040,7 +1040,7 @@ class HomeSlider extends Module
 					'</p>';
 	}
 
-	private function getShopAssociationError($id_slide)
+	protected function getShopAssociationError($id_slide)
 	{
 		return '<p class="alert alert-danger">'.
 						sprintf($this->l('Unable to get slide shop association information (id_slide: %d)'), (int)$id_slide).
@@ -1048,7 +1048,7 @@ class HomeSlider extends Module
 	}
 
 
-	private function getCurrentShopInfoMsg()
+	protected function getCurrentShopInfoMsg()
 	{
 		$shop_info = null;
 
@@ -1069,7 +1069,7 @@ class HomeSlider extends Module
 			return '';
 	}
 
-	private function getSharedSlideWarning()
+	protected function getSharedSlideWarning()
 	{
 		return '<p class="alert alert-warning">'.
 					$this->l('This slide is shared with other shops! All shops associated to this slide will apply modifications made here').
