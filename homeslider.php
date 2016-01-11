@@ -32,9 +32,11 @@ if (!defined('_PS_VERSION_')) {
     exit;
 }
 
+use PrestaShop\PrestaShop\Core\Business\Module\WidgetInterface;
+
 include_once(_PS_MODULE_DIR_.'homeslider/HomeSlide.php');
 
-class HomeSlider extends Module
+class HomeSlider extends Module implements WidgetInterface
 {
     protected $_html = '';
     protected $default_width = 779;
@@ -46,7 +48,7 @@ class HomeSlider extends Module
     {
         $this->name = 'homeslider';
         $this->tab = 'front_office_features';
-        $this->version = '1.6.0';
+        $this->version = '2.0.0';
         $this->author = 'PrestaShop';
         $this->need_instance = 0;
         $this->secure_key = Tools::encrypt($this->name);
@@ -56,7 +58,7 @@ class HomeSlider extends Module
 
         $this->displayName = $this->l('Image slider for your homepage');
         $this->description = $this->l('Adds an image slider to your homepage.');
-        $this->ps_versions_compliancy = array('min' => '1.6.0.4', 'max' => _PS_VERSION_);
+        $this->ps_versions_compliancy = array('min' => '1.7', 'max' => _PS_VERSION_);
     }
 
     /**
@@ -67,7 +69,7 @@ class HomeSlider extends Module
         /* Adds Module */
         if (parent::install() &&
             $this->registerHook('displayHeader') &&
-            $this->registerHook('displayTopColumn') &&
+            $this->registerHook('displayHome') &&
             $this->registerHook('actionShopDataDuplication')
         ) {
             $shops = Shop::getContextListShopID();
@@ -82,8 +84,7 @@ class HomeSlider extends Module
                 }
 
                 /* Sets up configuration */
-                $res = Configuration::updateValue('HOMESLIDER_WIDTH', $this->default_width, false, $shop_group_id, $shop_id);
-                $res &= Configuration::updateValue('HOMESLIDER_SPEED', $this->default_speed, false, $shop_group_id, $shop_id);
+                $res = Configuration::updateValue('HOMESLIDER_SPEED', $this->default_speed, false, $shop_group_id, $shop_id);
                 $res &= Configuration::updateValue('HOMESLIDER_PAUSE', $this->default_pause, false, $shop_group_id, $shop_id);
                 $res &= Configuration::updateValue('HOMESLIDER_LOOP', $this->default_loop, false, $shop_group_id, $shop_id);
             }
@@ -91,7 +92,6 @@ class HomeSlider extends Module
             /* Sets up Shop Group configuration */
             if (count($shop_groups_list)) {
                 foreach ($shop_groups_list as $shop_group_id) {
-                    $res = Configuration::updateValue('HOMESLIDER_WIDTH', $this->default_width, false, $shop_group_id);
                     $res &= Configuration::updateValue('HOMESLIDER_SPEED', $this->default_speed, false, $shop_group_id);
                     $res &= Configuration::updateValue('HOMESLIDER_PAUSE', $this->default_pause, false, $shop_group_id);
                     $res &= Configuration::updateValue('HOMESLIDER_LOOP', $this->default_loop, false, $shop_group_id);
@@ -99,7 +99,6 @@ class HomeSlider extends Module
             }
 
             /* Sets up Global configuration */
-            $res = Configuration::updateValue('HOMESLIDER_WIDTH', $this->default_width);
             $res &= Configuration::updateValue('HOMESLIDER_SPEED', $this->default_speed);
             $res &= Configuration::updateValue('HOMESLIDER_PAUSE', $this->default_pause);
             $res &= Configuration::updateValue('HOMESLIDER_LOOP', $this->default_loop);
@@ -137,7 +136,7 @@ class HomeSlider extends Module
                 <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Proin tristique in tortor et dignissim. Quisque non tempor leo. Maecenas egestas sem elit</p>
                 <p><button class="btn btn-default" type="button">Shop now !</button></p>';
                 $slide->legend[$language['id_lang']] = 'sample-'.$i;
-                $slide->url[$language['id_lang']] = 'http://www.prestashop.com/?utm_source=back-office&utm_medium=v16_homeslider'
+                $slide->url[$language['id_lang']] = 'http://www.prestashop.com/?utm_source=back-office&utm_medium=v17_homeslider'
                     .'&utm_campaign=back-office-'.Tools::strtoupper($this->context->language->iso_code)
                     .'&utm_content='.(defined('_PS_HOST_MODE_') ? 'ondemand' : 'download');
                 $slide->image[$language['id_lang']] = 'sample-'.$i.'.jpg';
@@ -157,7 +156,6 @@ class HomeSlider extends Module
             $res = $this->deleteTables();
 
             /* Unsets configuration */
-            $res &= Configuration::deleteByName('HOMESLIDER_WIDTH');
             $res &= Configuration::deleteByName('HOMESLIDER_SPEED');
             $res &= Configuration::deleteByName('HOMESLIDER_PAUSE');
             $res &= Configuration::deleteByName('HOMESLIDER_LOOP');
@@ -293,9 +291,7 @@ class HomeSlider extends Module
 
         /* Validation for Slider configuration */
         if (Tools::isSubmit('submitSlider')) {
-            if (!Validate::isInt(Tools::getValue('HOMESLIDER_SPEED')) || !Validate::isInt(Tools::getValue('HOMESLIDER_PAUSE')) ||
-                !Validate::isInt(Tools::getValue('HOMESLIDER_WIDTH'))
-            ) {
+            if (!Validate::isInt(Tools::getValue('HOMESLIDER_SPEED')) || !Validate::isInt(Tools::getValue('HOMESLIDER_PAUSE'))) {
                 $errors[] = $this->l('Invalid values');
             }
         } elseif (Tools::isSubmit('changeStatus')) {
@@ -393,8 +389,7 @@ class HomeSlider extends Module
                     $shop_groups_list[] = $shop_group_id;
                 }
 
-                $res = Configuration::updateValue('HOMESLIDER_WIDTH', (int)Tools::getValue('HOMESLIDER_WIDTH'), false, $shop_group_id, $shop_id);
-                $res &= Configuration::updateValue('HOMESLIDER_SPEED', (int)Tools::getValue('HOMESLIDER_SPEED'), false, $shop_group_id, $shop_id);
+                $res = Configuration::updateValue('HOMESLIDER_SPEED', (int)Tools::getValue('HOMESLIDER_SPEED'), false, $shop_group_id, $shop_id);
                 $res &= Configuration::updateValue('HOMESLIDER_PAUSE', (int)Tools::getValue('HOMESLIDER_PAUSE'), false, $shop_group_id, $shop_id);
                 $res &= Configuration::updateValue('HOMESLIDER_LOOP', (int)Tools::getValue('HOMESLIDER_LOOP'), false, $shop_group_id, $shop_id);
             }
@@ -402,13 +397,11 @@ class HomeSlider extends Module
             /* Update global shop context if needed*/
             switch ($shop_context) {
                 case Shop::CONTEXT_ALL:
-                    $res = Configuration::updateValue('HOMESLIDER_WIDTH', (int)Tools::getValue('HOMESLIDER_WIDTH'));
                     $res &= Configuration::updateValue('HOMESLIDER_SPEED', (int)Tools::getValue('HOMESLIDER_SPEED'));
                     $res &= Configuration::updateValue('HOMESLIDER_PAUSE', (int)Tools::getValue('HOMESLIDER_PAUSE'));
                     $res &= Configuration::updateValue('HOMESLIDER_LOOP', (int)Tools::getValue('HOMESLIDER_LOOP'));
                     if (count($shop_groups_list)) {
                         foreach ($shop_groups_list as $shop_group_id) {
-                            $res = Configuration::updateValue('HOMESLIDER_WIDTH', (int)Tools::getValue('HOMESLIDER_WIDTH'), false, $shop_group_id);
                             $res &= Configuration::updateValue('HOMESLIDER_SPEED', (int)Tools::getValue('HOMESLIDER_SPEED'), false, $shop_group_id);
                             $res &= Configuration::updateValue('HOMESLIDER_PAUSE', (int)Tools::getValue('HOMESLIDER_PAUSE'), false, $shop_group_id);
                             $res &= Configuration::updateValue('HOMESLIDER_LOOP', (int)Tools::getValue('HOMESLIDER_LOOP'), false, $shop_group_id);
@@ -418,7 +411,6 @@ class HomeSlider extends Module
                 case Shop::CONTEXT_GROUP:
                     if (count($shop_groups_list)) {
                         foreach ($shop_groups_list as $shop_group_id) {
-                            $res = Configuration::updateValue('HOMESLIDER_WIDTH', (int)Tools::getValue('HOMESLIDER_WIDTH'), false, $shop_group_id);
                             $res &= Configuration::updateValue('HOMESLIDER_SPEED', (int)Tools::getValue('HOMESLIDER_SPEED'), false, $shop_group_id);
                             $res &= Configuration::updateValue('HOMESLIDER_PAUSE', (int)Tools::getValue('HOMESLIDER_PAUSE'), false, $shop_group_id);
                             $res &= Configuration::updateValue('HOMESLIDER_LOOP', (int)Tools::getValue('HOMESLIDER_LOOP'), false, $shop_group_id);
@@ -537,75 +529,43 @@ class HomeSlider extends Module
         }
     }
 
-    protected function _prepareHook()
-    {
-        if (!$this->isCached('homeslider.tpl', $this->getCacheId())) {
-            $slides = $this->getSlides(true);
-            if (is_array($slides)) {
-                foreach ($slides as &$slide) {
-                    $slide['sizes'] = @getimagesize((dirname(__FILE__) . DIRECTORY_SEPARATOR . 'images' . DIRECTORY_SEPARATOR . $slide['image']));
-                    if (isset($slide['sizes'][3]) && $slide['sizes'][3]) {
-                        $slide['size'] = $slide['sizes'][3];
-                    }
-                }
-            }
-
-            if (!$slides) {
-                return false;
-            }
-
-            $this->smarty->assign(array('homeslider_slides' => $slides));
-        }
-
-        return true;
-    }
-
     public function hookdisplayHeader($params)
     {
-        if (!isset($this->context->controller->php_self) || $this->context->controller->php_self != 'index') {
-            return;
-        }
-        $this->context->controller->addCSS($this->_path.'homeslider.css');
+        $this->context->controller->addCSS($this->_path.'css/homeslider.css');
         $this->context->controller->addJS($this->_path.'js/homeslider.js');
-        $this->context->controller->addJqueryPlugin(array('bxslider'));
+    }
+
+    public function renderWidget($hookName = null, array $configuration = [])
+    {
+        if (!$this->isCached('homeslider.tpl', $this->getCacheId())) {
+            $this->smarty->assign($this->getWidgetVariables($hookName, $configuration));
+        }
+
+        return $this->display(__FILE__, 'homeslider.tpl', $this->getCacheId());
+    }
+
+    public function getWidgetVariables($hookName = null, array $configuration = [])
+    {
+        $slides = $this->getSlides(true);
+        if (is_array($slides)) {
+            foreach ($slides as &$slide) {
+                $slide['sizes'] = @getimagesize((dirname(__FILE__) . DIRECTORY_SEPARATOR . 'images' . DIRECTORY_SEPARATOR . $slide['image']));
+                if (isset($slide['sizes'][3]) && $slide['sizes'][3]) {
+                    $slide['size'] = $slide['sizes'][3];
+                }
+            }
+        }
 
         $config = $this->getConfigFieldsValues();
-        $slider = array(
-            'width' => $config['HOMESLIDER_WIDTH'],
-            'speed' => $config['HOMESLIDER_SPEED'],
-            'pause' => $config['HOMESLIDER_PAUSE'],
-            'loop' => (bool)$config['HOMESLIDER_LOOP'],
-        );
 
-        $this->smarty->assign('homeslider', $slider);
-        return $this->display(__FILE__, 'header.tpl');
-    }
-
-    public function hookdisplayTop($params)
-    {
-        return $this->hookdisplayTopColumn($params);
-    }
-
-    public function hookdisplayTopColumn($params)
-    {
-        if (!isset($this->context->controller->php_self) || $this->context->controller->php_self != 'index') {
-            return;
-        }
-
-        if (!$this->_prepareHook()) {
-            return false;
-        }
-
-        return $this->display(__FILE__, 'homeslider.tpl', $this->getCacheId());
-    }
-
-    public function hookDisplayHome()
-    {
-        if (!$this->_prepareHook()) {
-            return false;
-        }
-
-        return $this->display(__FILE__, 'homeslider.tpl', $this->getCacheId());
+        return [
+            'homeslider' => [
+                'speed' => $config['HOMESLIDER_SPEED'],
+                'pause' => $config['HOMESLIDER_PAUSE'],
+                'autoplay' => (bool)$config['HOMESLIDER_LOOP'],
+                'slides' => $slides,
+            ],
+        ];
     }
 
     public function clearCache()
@@ -890,12 +850,6 @@ class HomeSlider extends Module
                 'input' => array(
                     array(
                         'type' => 'text',
-                        'label' => $this->l('Maximum image width'),
-                        'name' => 'HOMESLIDER_WIDTH',
-                        'suffix' => 'pixels'
-                    ),
-                    array(
-                        'type' => 'text',
                         'label' => $this->l('Speed'),
                         'name' => 'HOMESLIDER_SPEED',
                         'suffix' => 'milliseconds',
@@ -959,7 +913,6 @@ class HomeSlider extends Module
         $id_shop = Shop::getContextShopID();
 
         return array(
-            'HOMESLIDER_WIDTH' => Tools::getValue('HOMESLIDER_WIDTH', Configuration::get('HOMESLIDER_WIDTH', null, $id_shop_group, $id_shop)),
             'HOMESLIDER_SPEED' => Tools::getValue('HOMESLIDER_SPEED', Configuration::get('HOMESLIDER_SPEED', null, $id_shop_group, $id_shop)),
             'HOMESLIDER_PAUSE' => Tools::getValue('HOMESLIDER_PAUSE', Configuration::get('HOMESLIDER_PAUSE', null, $id_shop_group, $id_shop)),
             'HOMESLIDER_LOOP' => Tools::getValue('HOMESLIDER_LOOP', Configuration::get('HOMESLIDER_LOOP', null, $id_shop_group, $id_shop)),

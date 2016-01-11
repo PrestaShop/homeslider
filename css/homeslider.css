@@ -1,91 +1,74 @@
-/* @override http://localhost/bxslider_v3_plugin/css/styles.css */
-
-/*
- * To change the color scheme of slider change each 
- * background property for each of the five styles below
- */
-.bx-window {margin-bottom:20px;}
-.bx-wrapper {
-	margin-bottom:20px;
-	height:300px
-}
-/*next button*/
-.bx-next {
-	display:none;
-	position:absolute;
-	top:40%;
-	right:-50px;
-	z-index:999;
-	width: 30px;
-	height: 30px;
-	text-indent: -999999px;
-	background: url(../img/gray_next.png) no-repeat 0 -30px;
-}
-/*previous button*/
-.bx-prev {
-	display:none;
-	position:absolute;
-	top:40%;
-	left:-50px;
-	z-index:999;
-	width: 30px;
-	height: 30px;
-	text-indent: -999999px;
-	background: url(../img/gray_prev.png) no-repeat 0 -30px;
-}
-/*pager links*/
-.bx-pager {
-	position: absolute;
-	bottom: 20px;
-	bottom:40px !ie;/* hack ie7 */
-	right: 15px;
-	padding-top: 7px;
-	font-size:11px;
-	color:#666;
-	text-align:center;
-}
-.bx-pager a {
-	display:inline-block;
-	zoom:1;
-	margin-right: 5px;
-	padding:4px 0 0 1px;
-	height:16px;/* 19 */
-	width:18px;/* 19 */
-	font-weight:bold;
-	font-size: 11px;
-	color:#000;
-	text-decoration:none;
-	background:url(../img/gray_pager.png) no-repeat 0 -20px;
+* {
+  margin: 0; padding: 0;
 }
 
-/*
- * End color scheme styles
- */
-/*next/prev button hover state*/
-.bx-next:hover,
-.bx-prev:hover {
-	background-position: 0 0;
+.homeslider {
+  position: relative;
+  margin: auto;
+  overflow: hidden;
+  list-style: none;
 }
-/*pager links hover and active states*/
-.bx-pager .pager-active,
-.bx-pager a:hover {
-	color:#fff;
-	text-decoration:none;
-	background-position: 0 0;
+.homeslider img {
+  display: block;
+  float: left;
 }
-/*captions*/
-.bx-captions {
-	text-align:center;
-	font-size: 12px;
-	padding: 7px 0;
-	color: #666;
+.homeslider ul {
+  list-style: none;
 }
-/*auto controls*/
-.bx-auto {
-	text-align: center;
-	padding-top: 15px;
+.homeslider ul li.slide {
+  position: relative;
+  float: left;
 }
-.bx-auto a {
-	color: #666;
-	font-size: 12px;
+.homeslider ul li.slide, .homeslider ul li.slide img {
+  height: 0px;
+}
+.homeslider ul li.slide img {
+  opacity: 0.5;
+}
+.homeslider ul li.slide.active, .homeslider ul li.slide.active img {
+  height: 100%;
+  width: 100%;
+}
+.homeslider ul li.slide.active img {
+  opacity: 1;
+}
+.homeslider .caption {
+  position: absolute;
+  bottom: 0; left: 0; right: 0;
+  padding: 10px;
+  text-transform: uppercase;
+  background-color: rgba(255, 255, 255, 0.6);
+}
+
+.homeslider .caption h2, .homeslider .caption div {
+  padding: 7px;
+}
+.homeslider .caption h2 {
+  font-size: 24px;
+}
+.homeslider .caption div {
+  font-size: 18px;
+  float: left;
+  clear: both;
+}
+
+.direction {
+  position: absolute;
+  top: 50%; margin-top: -74px;
+  left: 0; right: 0;
+  display: block;
+  z-index: 9999;
+}
+.direction .prev, .direction .next {
+  position: absolute;
+  top: 50%;
+  color: #ffffff;
+  font-size: 40px ;
+  cursor: pointer;
+}
+.direction .prev {
+  left: 10px;
+}
+.direction .next {
+  right: 10px;
 }
