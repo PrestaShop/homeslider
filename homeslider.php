@@ -32,7 +32,7 @@ if (!defined('_PS_VERSION_')) {
     exit;
 }
 
-use PrestaShop\PrestaShop\Core\Business\Module\WidgetInterface;
+use PrestaShop\PrestaShop\Core\Module\WidgetInterface;
 
 include_once(_PS_MODULE_DIR_.'homeslider/HomeSlide.php');
 
