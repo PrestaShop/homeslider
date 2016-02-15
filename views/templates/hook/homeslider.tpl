@@ -25,7 +25,7 @@
 *}
 
 {if $homeslider.slides}
-  <div class="homeslider" data-transition-speed="{$homeslider.speed}" data-pause-duration="{$homeslider.pause}" data-autoplay="{$homeslider.autoplay}">
+  <div class="homeslider" data-interval="{$homeslider.speed}" data-wrap="{$homeslider.wrap}">
     <ul>
       {foreach from=$homeslider.slides item=slide}
         <li class="slide">

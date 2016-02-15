@@ -40,9 +40,8 @@ class HomeSlider extends Module implements WidgetInterface
 {
     protected $_html = '';
     protected $default_width = 779;
-    protected $default_speed = 500;
-    protected $default_pause = 3000;
-    protected $default_loop = 1;
+    protected $default_speed = 2000;
+    protected $default_wrap = 1;
 
     public function __construct()
     {
@@ -85,23 +84,20 @@ class HomeSlider extends Module implements WidgetInterface
 
                 /* Sets up configuration */
                 $res = Configuration::updateValue('HOMESLIDER_SPEED', $this->default_speed, false, $shop_group_id, $shop_id);
-                $res &= Configuration::updateValue('HOMESLIDER_PAUSE', $this->default_pause, false, $shop_group_id, $shop_id);
-                $res &= Configuration::updateValue('HOMESLIDER_LOOP', $this->default_loop, false, $shop_group_id, $shop_id);
+                $res &= Configuration::updateValue('HOMESLIDER_WRAP', $this->default_wrap, false, $shop_group_id, $shop_id);
             }
 
             /* Sets up Shop Group configuration */
             if (count($shop_groups_list)) {
                 foreach ($shop_groups_list as $shop_group_id) {
                     $res &= Configuration::updateValue('HOMESLIDER_SPEED', $this->default_speed, false, $shop_group_id);
-                    $res &= Configuration::updateValue('HOMESLIDER_PAUSE', $this->default_pause, false, $shop_group_id);
-                    $res &= Configuration::updateValue('HOMESLIDER_LOOP', $this->default_loop, false, $shop_group_id);
+                    $res &= Configuration::updateValue('HOMESLIDER_WRAP', $this->default_wrap, false, $shop_group_id);
                 }
             }
 
             /* Sets up Global configuration */
             $res &= Configuration::updateValue('HOMESLIDER_SPEED', $this->default_speed);
-            $res &= Configuration::updateValue('HOMESLIDER_PAUSE', $this->default_pause);
-            $res &= Configuration::updateValue('HOMESLIDER_LOOP', $this->default_loop);
+            $res &= Configuration::updateValue('HOMESLIDER_WRAP', $this->default_wrap);
 
             /* Creates tables */
             $res &= $this->createTables();
@@ -156,8 +152,7 @@ class HomeSlider extends Module implements WidgetInterface
 
             /* Unsets configuration */
             $res &= Configuration::deleteByName('HOMESLIDER_SPEED');
-            $res &= Configuration::deleteByName('HOMESLIDER_PAUSE');
-            $res &= Configuration::deleteByName('HOMESLIDER_LOOP');
+            $res &= Configuration::deleteByName('HOMESLIDER_WRAP');
 
             return (bool)$res;
         }
@@ -290,7 +285,7 @@ class HomeSlider extends Module implements WidgetInterface
 
         /* Validation for Slider configuration */
         if (Tools::isSubmit('submitSlider')) {
-            if (!Validate::isInt(Tools::getValue('HOMESLIDER_SPEED')) || !Validate::isInt(Tools::getValue('HOMESLIDER_PAUSE'))) {
+            if (!Validate::isInt(Tools::getValue('HOMESLIDER_SPEED'))) {
                 $errors[] = $this->l('Invalid values');
             }
         } elseif (Tools::isSubmit('changeStatus')) {
@@ -383,21 +378,18 @@ class HomeSlider extends Module implements WidgetInterface
                 }
 
                 $res = Configuration::updateValue('HOMESLIDER_SPEED', (int)Tools::getValue('HOMESLIDER_SPEED'), false, $shop_group_id, $shop_id);
-                $res &= Configuration::updateValue('HOMESLIDER_PAUSE', (int)Tools::getValue('HOMESLIDER_PAUSE'), false, $shop_group_id, $shop_id);
-                $res &= Configuration::updateValue('HOMESLIDER_LOOP', (int)Tools::getValue('HOMESLIDER_LOOP'), false, $shop_group_id, $shop_id);
+                $res &= Configuration::updateValue('HOMESLIDER_WRAP', (int)Tools::getValue('HOMESLIDER_WRAP'), false, $shop_group_id, $shop_id);
             }
 
             /* Update global shop context if needed*/
             switch ($shop_context) {
                 case Shop::CONTEXT_ALL:
                     $res &= Configuration::updateValue('HOMESLIDER_SPEED', (int)Tools::getValue('HOMESLIDER_SPEED'));
-                    $res &= Configuration::updateValue('HOMESLIDER_PAUSE', (int)Tools::getValue('HOMESLIDER_PAUSE'));
-                    $res &= Configuration::updateValue('HOMESLIDER_LOOP', (int)Tools::getValue('HOMESLIDER_LOOP'));
+                    $res &= Configuration::updateValue('HOMESLIDER_WRAP', (int)Tools::getValue('HOMESLIDER_WRAP'));
                     if (count($shop_groups_list)) {
                         foreach ($shop_groups_list as $shop_group_id) {
                             $res &= Configuration::updateValue('HOMESLIDER_SPEED', (int)Tools::getValue('HOMESLIDER_SPEED'), false, $shop_group_id);
-                            $res &= Configuration::updateValue('HOMESLIDER_PAUSE', (int)Tools::getValue('HOMESLIDER_PAUSE'), false, $shop_group_id);
-                            $res &= Configuration::updateValue('HOMESLIDER_LOOP', (int)Tools::getValue('HOMESLIDER_LOOP'), false, $shop_group_id);
+                            $res &= Configuration::updateValue('HOMESLIDER_WRAP', (int)Tools::getValue('HOMESLIDER_WRAP'), false, $shop_group_id);
                         }
                     }
                     break;
@@ -405,8 +397,7 @@ class HomeSlider extends Module implements WidgetInterface
                     if (count($shop_groups_list)) {
                         foreach ($shop_groups_list as $shop_group_id) {
                             $res &= Configuration::updateValue('HOMESLIDER_SPEED', (int)Tools::getValue('HOMESLIDER_SPEED'), false, $shop_group_id);
-                            $res &= Configuration::updateValue('HOMESLIDER_PAUSE', (int)Tools::getValue('HOMESLIDER_PAUSE'), false, $shop_group_id);
-                            $res &= Configuration::updateValue('HOMESLIDER_LOOP', (int)Tools::getValue('HOMESLIDER_LOOP'), false, $shop_group_id);
+                            $res &= Configuration::updateValue('HOMESLIDER_WRAP', (int)Tools::getValue('HOMESLIDER_WRAP'), false, $shop_group_id);
                         }
                     }
                     break;
@@ -554,8 +545,7 @@ class HomeSlider extends Module implements WidgetInterface
         return [
             'homeslider' => [
                 'speed' => $config['HOMESLIDER_SPEED'],
-                'pause' => $config['HOMESLIDER_PAUSE'],
-                'autoplay' => (bool)$config['HOMESLIDER_LOOP'],
+                'wrap' => (bool)$config['HOMESLIDER_WRAP'],
                 'slides' => $slides,
             ],
         ];
@@ -844,19 +834,14 @@ class HomeSlider extends Module implements WidgetInterface
                         'label' => $this->l('Speed'),
                         'name' => 'HOMESLIDER_SPEED',
                         'suffix' => 'milliseconds',
+                        'class' => 'fixed-width-sm',
                         'desc' => $this->l('The duration of the transition between two slides.')
                     ),
                     array(
-                        'type' => 'text',
-                        'label' => $this->l('Pause'),
-                        'name' => 'HOMESLIDER_PAUSE',
-                        'suffix' => 'milliseconds',
-                        'desc' => $this->l('The delay between two slides.')
-                    ),
-                    array(
                         'type' => 'switch',
-                        'label' => $this->l('Auto play'),
-                        'name' => 'HOMESLIDER_LOOP',
+                        'label' => $this->l('Loop forever'),
+                        'name' => 'HOMESLIDER_WRAP',
+                        'desc' => $this->l('Loop or stop after the last slide.'),
                         'values' => array(
                             array(
                                 'id' => 'active_on',
@@ -869,7 +854,7 @@ class HomeSlider extends Module implements WidgetInterface
                                 'label' => $this->l('Disabled')
                             )
                         ),
-                    )
+                    ),
                 ),
                 'submit' => array(
                     'title' => $this->l('Save'),
@@ -905,8 +890,7 @@ class HomeSlider extends Module implements WidgetInterface
 
         return array(
             'HOMESLIDER_SPEED' => Tools::getValue('HOMESLIDER_SPEED', Configuration::get('HOMESLIDER_SPEED', null, $id_shop_group, $id_shop)),
-            'HOMESLIDER_PAUSE' => Tools::getValue('HOMESLIDER_PAUSE', Configuration::get('HOMESLIDER_PAUSE', null, $id_shop_group, $id_shop)),
-            'HOMESLIDER_LOOP' => Tools::getValue('HOMESLIDER_LOOP', Configuration::get('HOMESLIDER_LOOP', null, $id_shop_group, $id_shop)),
+            'HOMESLIDER_WRAP' => Tools::getValue('HOMESLIDER_WRAP', Configuration::get('HOMESLIDER_WRAP', null, $id_shop_group, $id_shop)),
         );
     }
 
