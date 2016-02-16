@@ -555,7 +555,7 @@ class HomeSlider extends Module implements WidgetInterface
             'homeslider' => [
                 'speed' => $config['HOMESLIDER_SPEED'],
                 'pause' => $config['HOMESLIDER_PAUSE_ON_HOVER'] ? 'hover' : '',
-                'wrap' => (bool)$config['HOMESLIDER_WRAP'],
+                'wrap' => $config['HOMESLIDER_WRAP'] ? 'true' : 'false',
                 'slides' => $slides,
             ],
         ];
