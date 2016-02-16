@@ -41,6 +41,7 @@ class HomeSlider extends Module implements WidgetInterface
     protected $_html = '';
     protected $default_width = 779;
     protected $default_speed = 2000;
+    protected $default_pause_on_hover = 1;
     protected $default_wrap = 1;
 
     public function __construct()
@@ -84,6 +85,7 @@ class HomeSlider extends Module implements WidgetInterface
 
                 /* Sets up configuration */
                 $res = Configuration::updateValue('HOMESLIDER_SPEED', $this->default_speed, false, $shop_group_id, $shop_id);
+                $res &= Configuration::updateValue('HOMESLIDER_PAUSE_ON_HOVER', $this->default_pause_on_hover, false, $shop_group_id, $shop_id);
                 $res &= Configuration::updateValue('HOMESLIDER_WRAP', $this->default_wrap, false, $shop_group_id, $shop_id);
             }
 
@@ -91,12 +93,14 @@ class HomeSlider extends Module implements WidgetInterface
             if (count($shop_groups_list)) {
                 foreach ($shop_groups_list as $shop_group_id) {
                     $res &= Configuration::updateValue('HOMESLIDER_SPEED', $this->default_speed, false, $shop_group_id);
+                    $res &= Configuration::updateValue('HOMESLIDER_PAUSE_ON_HOVER', $this->default_pause_on_hover, false, $shop_group_id);
                     $res &= Configuration::updateValue('HOMESLIDER_WRAP', $this->default_wrap, false, $shop_group_id);
                 }
             }
 
             /* Sets up Global configuration */
             $res &= Configuration::updateValue('HOMESLIDER_SPEED', $this->default_speed);
+            $res &= Configuration::updateValue('HOMESLIDER_PAUSE_ON_HOVER', $this->default_pause_on_hover);
             $res &= Configuration::updateValue('HOMESLIDER_WRAP', $this->default_wrap);
 
             /* Creates tables */
@@ -152,6 +156,7 @@ class HomeSlider extends Module implements WidgetInterface
 
             /* Unsets configuration */
             $res &= Configuration::deleteByName('HOMESLIDER_SPEED');
+            $res &= Configuration::deleteByName('HOMESLIDER_PAUSE_ON_HOVER');
             $res &= Configuration::deleteByName('HOMESLIDER_WRAP');
 
             return (bool)$res;
@@ -378,6 +383,7 @@ class HomeSlider extends Module implements WidgetInterface
                 }
 
                 $res = Configuration::updateValue('HOMESLIDER_SPEED', (int)Tools::getValue('HOMESLIDER_SPEED'), false, $shop_group_id, $shop_id);
+                $res &= Configuration::updateValue('HOMESLIDER_PAUSE_ON_HOVER', (int)Tools::getValue('HOMESLIDER_PAUSE_ON_HOVER'), false, $shop_group_id, $shop_id);
                 $res &= Configuration::updateValue('HOMESLIDER_WRAP', (int)Tools::getValue('HOMESLIDER_WRAP'), false, $shop_group_id, $shop_id);
             }
 
@@ -385,10 +391,12 @@ class HomeSlider extends Module implements WidgetInterface
             switch ($shop_context) {
                 case Shop::CONTEXT_ALL:
                     $res &= Configuration::updateValue('HOMESLIDER_SPEED', (int)Tools::getValue('HOMESLIDER_SPEED'));
+                    $res &= Configuration::updateValue('HOMESLIDER_PAUSE_ON_HOVER', (int)Tools::getValue('HOMESLIDER_PAUSE_ON_HOVER'));
                     $res &= Configuration::updateValue('HOMESLIDER_WRAP', (int)Tools::getValue('HOMESLIDER_WRAP'));
                     if (count($shop_groups_list)) {
                         foreach ($shop_groups_list as $shop_group_id) {
                             $res &= Configuration::updateValue('HOMESLIDER_SPEED', (int)Tools::getValue('HOMESLIDER_SPEED'), false, $shop_group_id);
+                            $res &= Configuration::updateValue('HOMESLIDER_PAUSE_ON_HOVER', (int)Tools::getValue('HOMESLIDER_PAUSE_ON_HOVER'), false, $shop_group_id);
                             $res &= Configuration::updateValue('HOMESLIDER_WRAP', (int)Tools::getValue('HOMESLIDER_WRAP'), false, $shop_group_id);
                         }
                     }
@@ -397,6 +405,7 @@ class HomeSlider extends Module implements WidgetInterface
                     if (count($shop_groups_list)) {
                         foreach ($shop_groups_list as $shop_group_id) {
                             $res &= Configuration::updateValue('HOMESLIDER_SPEED', (int)Tools::getValue('HOMESLIDER_SPEED'), false, $shop_group_id);
+                            $res &= Configuration::updateValue('HOMESLIDER_PAUSE_ON_HOVER', (int)Tools::getValue('HOMESLIDER_PAUSE_ON_HOVER'), false, $shop_group_id);
                             $res &= Configuration::updateValue('HOMESLIDER_WRAP', (int)Tools::getValue('HOMESLIDER_WRAP'), false, $shop_group_id);
                         }
                     }
@@ -545,6 +554,7 @@ class HomeSlider extends Module implements WidgetInterface
         return [
             'homeslider' => [
                 'speed' => $config['HOMESLIDER_SPEED'],
+                'pause' => $config['HOMESLIDER_PAUSE_ON_HOVER'] ? 'hover' : '',
                 'wrap' => (bool)$config['HOMESLIDER_WRAP'],
                 'slides' => $slides,
             ],
@@ -839,6 +849,24 @@ class HomeSlider extends Module implements WidgetInterface
                     ),
                     array(
                         'type' => 'switch',
+                        'label' => $this->l('Pause on hover'),
+                        'name' => 'HOMESLIDER_PAUSE_ON_HOVER',
+                        'desc' => $this->l('Stop sliding when .'),
+                        'values' => array(
+                            array(
+                                'id' => 'active_on',
+                                'value' => 1,
+                                'label' => $this->l('Enabled')
+                            ),
+                            array(
+                                'id' => 'active_off',
+                                'value' => 0,
+                                'label' => $this->l('Disabled')
+                            )
+                        ),
+                    ),
+                    array(
+                        'type' => 'switch',
                         'label' => $this->l('Loop forever'),
                         'name' => 'HOMESLIDER_WRAP',
                         'desc' => $this->l('Loop or stop after the last slide.'),
@@ -890,6 +918,7 @@ class HomeSlider extends Module implements WidgetInterface
 
         return array(
             'HOMESLIDER_SPEED' => Tools::getValue('HOMESLIDER_SPEED', Configuration::get('HOMESLIDER_SPEED', null, $id_shop_group, $id_shop)),
+            'HOMESLIDER_PAUSE_ON_HOVER' => Tools::getValue('HOMESLIDER_PAUSE_ON_HOVER', Configuration::get('HOMESLIDER_PAUSE_ON_HOVER', null, $id_shop_group, $id_shop)),
             'HOMESLIDER_WRAP' => Tools::getValue('HOMESLIDER_WRAP', Configuration::get('HOMESLIDER_WRAP', null, $id_shop_group, $id_shop)),
         );
     }
