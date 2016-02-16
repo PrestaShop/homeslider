@@ -29,12 +29,12 @@
     <ul>
       {foreach from=$homeslider.slides item=slide}
         <li class="slide">
-          <img src="{$link->getMediaLink("`$smarty.const._MODULE_DIR_`homeslider/images/`$slide.image`")}" alt="{$slide.legend|escape}" />
+          <img src="{$slide.image_url}" alt="{$slide.legend|escape}" />
           {if $slide.title || $slide.description }
-          <span class="caption">
-            <h2>{$slide.title}</h2>
-            <div>{$slide.description nofilter}</div>
-          </span>
+            <span class="caption">
+              <h2>{$slide.title}</h2>
+              <div>{$slide.description nofilter}</div>
+            </span>
           {/if}
         </li>
       {/foreach}

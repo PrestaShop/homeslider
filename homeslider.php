@@ -625,7 +625,7 @@ class HomeSlider extends Module implements WidgetInterface
         $id_shop = $this->context->shop->id;
         $id_lang = $this->context->language->id;
 
-        return Db::getInstance(_PS_USE_SQL_SLAVE_)->executeS('
+        $slides = Db::getInstance(_PS_USE_SQL_SLAVE_)->executeS('
             SELECT hs.`id_homeslider_slides` as id_slide, hss.`position`, hss.`active`, hssl.`title`,
             hssl.`url`, hssl.`legend`, hssl.`description`, hssl.`image`
             FROM '._DB_PREFIX_.'homeslider hs
@@ -636,6 +636,12 @@ class HomeSlider extends Module implements WidgetInterface
             ($active ? ' AND hss.`active` = 1' : ' ').'
             ORDER BY hss.position'
         );
+
+        foreach ($slides as &$slide) {
+            $slide['image_url'] = $this->context->link->getMediaLink(_MODULE_DIR_.'homeslider/images/'.$slide['image']);
+        }
+
+        return $slides;
     }
 
     public function getAllImagesBySlidesId($id_slides, $active = null, $id_shop = null)
