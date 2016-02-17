@@ -25,8 +25,8 @@
 *}
 
 {if $homeslider.slides}
-  <div class="homeslider" data-interval="{$homeslider.speed}" data-wrap="{$homeslider.wrap}" data-pause="{$homeslider.pause}">
-    <ul>
+  <div class="homeslider-container" data-interval="{$homeslider.speed}" data-wrap="{$homeslider.wrap}" data-pause="{$homeslider.pause}">
+    <ul class="rslides">
       {foreach from=$homeslider.slides item=slide}
         <li class="slide">
           <img src="{$slide.image_url}" alt="{$slide.legend|escape}" />
@@ -39,9 +39,5 @@
         </li>
       {/foreach}
     </ul>
-    <div class="direction">
-      <span class="prev">&lt;</span>
-      <span class="next">&gt;</span>
-    </div>
   </div>
 {/if}

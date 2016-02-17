@@ -24,23 +24,19 @@
 *  International Registered Trademark & Property of PrestaShop SA
 */
 
-$(function(){
-  $slideshow = $(".homeslider ul");
-  $slideactive = $slideshow.find("li.slide").first().addClass('active').show();
-  $(".direction .prev").click(function(){
-    $slideactive = $slideshow.find("li.active").prev();
-    if (!$slideactive.size()) {
-      $slideactive = $slideshow.find("li.slide").last();
-    }
-    $slideshow.find("li.active").removeClass("active");
-    $slideactive.addClass("active");
-  });
-  $(".direction .next").click(function(){
-    $slideactive = $slideshow.find("li.active").next();
-    if (!$slideactive.size()) {
-      $slideactive = $slideshow.find("li.slide").first();
-    }
-    $slideshow.find("li.active").removeClass("active");
-    $slideactive.addClass("active");
-  });
+jQuery(document).ready(function ($) {
+  var homesliderConfig = {
+    speed: 500,            // Integer: Speed of the transition, in milliseconds
+    timeout: $('.homeslider').data('interval'),          // Integer: Time between slide transitions, in milliseconds
+    nav: true,             // Boolean: Show navigation, true or false
+    random: false,          // Boolean: Randomize the order of the slides, true or false
+    pause: $('.homeslider').data('pause'),           // Boolean: Pause on hover, true or false
+    maxwidth: "",           // Integer: Max-width of the slideshow, in pixels
+    namespace: "homeslider",   // String: Change the default namespace used
+    before: function(){},   // Function: Before callback
+    after: function(){}     // Function: After callback
+  };
+
+  $(".rslides").responsiveSlides(homesliderConfig);
+
 });

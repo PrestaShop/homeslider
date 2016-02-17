@@ -1,74 +1,74 @@
-* {
-  margin: 0; padding: 0;
+.homeslider-container {
+  margin-bottom: 50px;
+  position: relative;
+  float: left;
+  width: 100%;
 }
 
 .homeslider {
   position: relative;
-  margin: auto;
-  overflow: hidden;
   list-style: none;
+  overflow: hidden;
+  width: 100%;
+  padding: 0;
+  margin: 0;
 }
+
+.homeslider li {
+  position: absolute;
+  width: 100%;
+  left: 0;
+  top: 0;
+}
+
 .homeslider img {
   display: block;
-  float: left;
-}
-.homeslider ul {
-  list-style: none;
-}
-.homeslider ul li.slide {
   position: relative;
-  float: left;
-}
-.homeslider ul li.slide, .homeslider ul li.slide img {
-  height: 0px;
-}
-.homeslider ul li.slide img {
-  opacity: 0.5;
-}
-.homeslider ul li.slide.active, .homeslider ul li.slide.active img {
-  height: 100%;
+  z-index: 1;
+  height: auto;
   width: 100%;
+  border: 0;
 }
-.homeslider ul li.slide.active img {
-  opacity: 1;
-}
+
 .homeslider .caption {
-  position: absolute;
-  bottom: 0; left: 0; right: 0;
-  padding: 10px;
-  text-transform: uppercase;
-  background-color: rgba(255, 255, 255, 0.6);
-}
-
-.homeslider .caption h2, .homeslider .caption div {
-  padding: 7px;
-}
-.homeslider .caption h2 {
-  font-size: 24px;
-}
-.homeslider .caption div {
-  font-size: 18px;
-  float: left;
-  clear: both;
-}
-
-.direction {
-  position: absolute;
-  top: 50%; margin-top: -74px;
-  left: 0; right: 0;
   display: block;
-  z-index: 9999;
-}
-.direction .prev, .direction .next {
   position: absolute;
-  top: 50%;
-  color: #ffffff;
-  font-size: 40px ;
-  cursor: pointer;
+  z-index: 2;
+  font-size: 1em;
+  text-shadow: none;
+  color: #fff;
+  background: #000;
+  background: rgba(0,0,0, .6);
+  left: 0;
+  right: 0;
+  bottom: 0;
+  padding: 10px 20px;
+  margin: 0;
+  max-width: none;
 }
-.direction .prev {
-  left: 10px;
+
+.homeslider_nav {
+  position: absolute;
+  -webkit-tap-highlight-color: rgba(0,0,0,0);
+  top: 52%;
+  left: 0;
+  opacity: 0.7;
+  z-index: 3;
+  text-indent: -9999px;
+  overflow: hidden;
+  text-decoration: none;
+  height: 61px;
+  width: 38px;
+  background: transparent url("../homeslider.gif") no-repeat left top;
+  margin-top: -45px;
 }
-.direction .next {
-  right: 10px;
+
+.homeslider_nav:active {
+  opacity: 1.0;
+}
+
+.homeslider_nav.next {
+  left: auto;
+  background-position: right top;
+  right: 0;
 }

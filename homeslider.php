@@ -525,6 +525,7 @@ class HomeSlider extends Module implements WidgetInterface
     public function hookdisplayHeader($params)
     {
         $this->context->controller->addCSS($this->_path.'css/homeslider.css');
+        $this->context->controller->addJS($this->_path.'js/responsiveslides.min.js');
         $this->context->controller->addJS($this->_path.'js/homeslider.js');
     }
 
