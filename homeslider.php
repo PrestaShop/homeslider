@@ -340,12 +340,6 @@ class HomeSlider extends Module implements WidgetInterface
 
             /* Checks title/url/legend/description for default lang */
             $id_lang_default = (int)Configuration::get('PS_LANG_DEFAULT');
-            if (Tools::strlen(Tools::getValue('title_' . $id_lang_default)) == 0) {
-                $errors[] = $this->l('The title is not set.');
-            }
-            if (Tools::strlen(Tools::getValue('legend_' . $id_lang_default)) == 0) {
-                $errors[] = $this->l('The caption is not set.');
-            }
             if (Tools::strlen(Tools::getValue('url_' . $id_lang_default)) == 0) {
                 $errors[] = $this->l('The URL is not set.');
             }
@@ -673,9 +667,9 @@ class HomeSlider extends Module implements WidgetInterface
         $icon = ((int)$active == 0 ? 'icon-remove' : 'icon-check');
         $class = ((int)$active == 0 ? 'btn-danger' : 'btn-success');
         $html = '<a class="btn '.$class.'" href="'.AdminController::$currentIndex.
-            '&configure='.$this->name.'
-                &token='.Tools::getAdminTokenLite('AdminModules').'
-                &changeStatus&id_slide='.(int)$id_slide.'" title="'.$title.'"><i class="'.$icon.'"></i> '.$title.'</a>';
+            '&configure='.$this->name.
+                '&token='.Tools::getAdminTokenLite('AdminModules').
+                '&changeStatus&id_slide='.(int)$id_slide.'" title="'.$title.'"><i class="'.$icon.'"></i> '.$title.'</a>';
 
         return $html;
     }
@@ -735,7 +729,6 @@ class HomeSlider extends Module implements WidgetInterface
                         'type' => 'text',
                         'label' => $this->l('Slide title'),
                         'name' => 'title',
-                        'required' => true,
                         'lang' => true,
                     ),
                     array(
@@ -749,7 +742,6 @@ class HomeSlider extends Module implements WidgetInterface
                         'type' => 'text',
                         'label' => $this->l('Caption'),
                         'name' => 'legend',
-                        'required' => true,
                         'lang' => true,
                     ),
                     array(
