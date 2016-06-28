@@ -48,7 +48,7 @@ $(document).ready(function(){
 			auto: (slideCount>1?homeslider_loop:0),
 			speed: parseInt(homeslider_speed),
 			pause: homeslider_pause,
-			controls: slideCount>1?true:false)
+			controls: (slideCount>1?true:false)
 		});
 
     $('.homeslider-description').click(function () {
