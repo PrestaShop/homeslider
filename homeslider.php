@@ -48,7 +48,7 @@ class HomeSlider extends Module
 		$this->version = '1.6.1';
 		$this->author = 'PrestaShop';
 		$this->need_instance = 0;
-		$this->secure_key = Tools::encrypt($this->name);
+		$this->secure_key = Tools::hash($this->name);
 		$this->bootstrap = true;
 
 		parent::__construct();
