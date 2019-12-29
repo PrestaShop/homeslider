@@ -35,7 +35,7 @@ $(document).ready(function(){
     if (typeof(homeslider_width) == 'undefined')
         homeslider_width = 779;
 
-
+	var slideCount = $('#homeslider li').length;
 	if (!!$.prototype.bxSlider)
 		$('#homeslider').bxSlider({
 			useCSS: false,
@@ -45,10 +45,10 @@ $(document).ready(function(){
 			hideControlOnEnd: true,
 			pager: false,
 			autoHover: true,
-			auto: homeslider_loop,
+			auto: (slideCount>1?homeslider_loop:0),
 			speed: parseInt(homeslider_speed),
 			pause: homeslider_pause,
-			controls: true
+			controls: (slideCount>1?true:false)
 		});
 
     $('.homeslider-description').click(function () {
